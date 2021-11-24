@@ -1,0 +1,73 @@
+// ************************************************************
+// style
+// ************************************************************
+
+@import 'scssVariable/variable.color';
+@import 'scssVariable/variable';
+
+
+@import 'base';
+@import 'mixin';
+@import 'placeholder';
+@import 'generateclass';
+@import 'guidestyle';
+@import 'theme.default';
+
+
+@import 'scssComponent/component.balls';
+@import 'scssComponent/component.danshi';
+@import 'scssComponent/component.language';
+@import 'scssComponent/component.pagination';
+@import 'scssComponent/component.table';
+
+
+@import 'scssElementui/elementui.button';
+@import 'scssElementui/_elementui.collapse';
+@import 'scssElementui/elementui.messagebox';
+@import 'scssElementui/elementui';
+@import 'scssElementui/elementui.tabs';
+
+
+@import 'scssPage/page';
+@import 'scssPage/page.detail';
+
+
+
+// 樣式
+// @import 'Style/_gr_variable.scss';
+@import 'Style/_gr_theme.scss';
+@import 'Style/_gr_module.scss';
+
+// 共用組件
+@import 'Module/c_ball';
+@import 'Module/c_button';
+@import 'Module/c_collapse';
+@import 'Module/c_dice';
+@import 'Module/c_dropdownbox';
+@import 'Module/c_grid';
+@import 'Module/c_input';
+@import 'Module/c_tab';
+@import 'Module/c_table';
+@import 'Module/c_lottery-category';
+@import 'Module/c_select';
+@import 'Module/c_tooltip';
+
+// Layout
+@import 'Layout/gr_header';
+@import 'Layout/gr_container';
+
+@import 'Layout/gr_home';
+
+@import 'Layout/game/gr_game-controller--sin';
+@import 'Layout/game/gr_game-menu';
+@import 'Layout/game/gr_game-record';
+@import 'Layout/game/gr_games-header';
+
+@import 'Layout/gr_trendline';
+
+// 共用元件
+@import 'gr_utilities.scss';
+
+
+
+@import 'rwd';

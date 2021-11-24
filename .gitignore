@@ -1,0 +1,12 @@
+.DS_Store
+/node_modules
+dist/
+public/
+npm-debug.log
+yarn-error.log
+.vscode/
+*.lock
+package-lock.json
+out/
+conf.json
+*.map
