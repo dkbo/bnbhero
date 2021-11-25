@@ -12,6 +12,7 @@
             </Col>
             <Col span="6">
                 <Button
+                        :loading="isLoading"
                         type="success"
                         long
                         icon="ios-search"
@@ -22,16 +23,19 @@
             </Col>
         </Row>
         <Row v-if="tableData.length">
-            總戰鬥總數: {{fightCount}}
-            戰鬥成功: {{fightSuccess}}
-            戰鬥失敗: {{fightFair}}
-            實際勝率: {{(fightSuccess / fightCount *100).toFixed(2)}}%
+            <Col span="24" class="info">
+                總戰鬥次數: {{fightCount}}
+                戰鬥成功: {{fightSuccess}}
+                戰鬥失敗: {{fightFair}}
+                實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
+            </Col>
         </Row>
 
         <Table :row-class-name="rowClassName" :columns="columns" :data="tableData" />
     </div>
 </template>
 <script>
+import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
 import axios from 'axios'
 import enemies from '@UTIL/enemies.js'
 import dayjs from 'dayjs'
@@ -40,7 +44,7 @@ export default {
     data() {
         return {
             api: 'https://graphql.bitquery.io',
-            walletAddress: '',
+            walletAddress: getStorage('walletAddress') || '',
             dataAddress: '0xde9fFb228C1789FEf3F08014498F2b16c57db855',
             filterHero: '',
             filterEnemyType: '',
@@ -72,16 +76,19 @@ export default {
                     key: 'date'
                 }
             ],
-            data: []
+            data: [],
+            isLoading: false
         }
     },
     beforeMount() {
-        this.handleCalc()
+        this.walletAddress && this.handleCalc()
     },
     methods: {
         async handleCalc() {
+            this.isLoading = true
             const count = await this.fetchGetCount()
-            this.fetchGetFightData(count)
+            await this.fetchGetFightData(count)
+            this.isLoading = false
         },
         fetchGetCount() {
             return axios
@@ -150,6 +157,7 @@ export default {
                 obj.date = dayjs.unix(block.timestamp.unixtime).format('YYYY/MM/DD HH:mm:ss')
                 return obj
             })
+            setStorage('walletAddress', this.walletAddress)
         },
         rowClassName(row) {
             return !row.rewards ? 'table-fair' : ''
@@ -182,4 +190,10 @@ export default {
         background-color: #ff00006b;
         color: #fff;
     }
+.info {
+    font-size: 16px;
+    padding: 10px 0;
+    background: #67a95b;
+    color: #ebebeb;
+}
 </style>
