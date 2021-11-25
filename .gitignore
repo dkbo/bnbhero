@@ -10,3 +10,4 @@ package-lock.json
 out/
 conf.json
 *.map
+api.http

@@ -1,0 +1,185 @@
+<template>
+    <div class="container">
+        <Row>
+            <Col span="6">
+                <Input v-model="walletAddress" placeholder="bsc 錢包位址" />
+            </Col>
+            <Col span="6">
+                <Input v-model="filterHero" placeholder="篩選英雄" />
+            </Col>
+            <Col span="6">
+                <Input v-model="filterEnemyType" placeholder="篩選敵人" />
+            </Col>
+            <Col span="6">
+                <Button
+                        type="success"
+                        long
+                        icon="ios-search"
+                        @click="handleCalc"
+                    >
+                        計算
+                    </Button>
+            </Col>
+        </Row>
+        <Row v-if="tableData.length">
+            總戰鬥總數: {{fightCount}}
+            戰鬥成功: {{fightSuccess}}
+            戰鬥失敗: {{fightFair}}
+            實際勝率: {{(fightSuccess / fightCount *100).toFixed(2)}}%
+        </Row>
+
+        <Table :row-class-name="rowClassName" :columns="columns" :data="tableData" />
+    </div>
+</template>
+<script>
+import axios from 'axios'
+import enemies from '@UTIL/enemies.js'
+import dayjs from 'dayjs'
+export default {
+    name: 'FightData',
+    data() {
+        return {
+            api: 'https://graphql.bitquery.io',
+            walletAddress: '',
+            dataAddress: '0xde9fFb228C1789FEf3F08014498F2b16c57db855',
+            filterHero: '',
+            filterEnemyType: '',
+            network: 'bsc',
+            eventType: 'Fight',
+            columns: [
+                {
+                    title: '英雄',
+                    key: '_attackingHero'
+                },
+                {
+                    title: '敵人',
+                    key: 'enemyType'
+                },
+                {
+                    title: '獎勵',
+                    key: 'rewards'
+                },
+                {
+                    title: '經驗值',
+                    key: 'xpGained'
+                },
+                {
+                    title: '損血',
+                    key: 'hpLoss'
+                },
+                {
+                    title: '時間',
+                    key: 'date'
+                }
+            ],
+            data: []
+        }
+    },
+    beforeMount() {
+        this.handleCalc()
+    },
+    methods: {
+        async handleCalc() {
+            const count = await this.fetchGetCount()
+            this.fetchGetFightData(count)
+        },
+        fetchGetCount() {
+            return axios
+                .post(this.api, {
+                    query: 'query ($network: EthereumNetwork!, $address: String!, $eventType: String!, $limit: Int!, $offset: Int!, $from: ISO8601DateTime, $to: ISO8601DateTime, $txFrom: [String!]) {\n  ethereum(network: $network) {\n    smartContractEvents(\n      options: {limit: $limit, offset: $offset}\n      date: {since: $from, till: $to}\n      txFrom: {in: $txFrom}\n      smartContractAddress: {is: $address}\n      smartContractEvent: {is: $eventType}\n    ) {\n      count(smartContractEvent: {is: $eventType})\n      __typename\n    }\n    __typename\n  }\n}',
+                    variables: {
+                        network: this.network,
+                        address: this.dataAddress,
+                        eventType: this.eventType,
+                        offset: 0,
+                        limit: 10000,
+                        from: null,
+                        to: null,
+                        txFrom: [this.walletAddress]
+                    }
+                })
+                .then(
+                    ({
+                        data: {
+                            data: {
+                                ethereum: { smartContractEvents }
+                            }
+                        }
+                    }) => smartContractEvents[0].count
+                )
+                .catch((err) => {
+                    console.error(err, '查詢戰鬥數據失敗')
+                    return -1
+                })
+        },
+        fetchGetFightData(limit) {
+            return axios
+                .post(this.api, {
+                    query: 'query ($network: EthereumNetwork!, $address: String!, $eventType: String!, $limit: Int!, $offset: Int!, $from: ISO8601DateTime, $to: ISO8601DateTime, $txFrom: [String!]) {\n  ethereum(network: $network) {\n    smartContractEvents(\n      options: {desc: "block.height", limit: $limit, offset: $offset}\n      date: {since: $from, till: $to}\n      txFrom: {in: $txFrom}\n      smartContractAddress: {is: $address}\n      smartContractEvent: {is: $eventType}\n    ) {\n      smartContractEvent {\n        name\n        __typename\n      }\n      block {\n        height\n        timestamp {\n          iso8601\n          unixtime\n          __typename\n        }\n        __typename\n      }\n      arguments {\n        value\n        argument\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
+                    variables: {
+                        network: this.network,
+                        address: this.dataAddress,
+                        eventType: this.eventType,
+                        offset: 0,
+                        limit,
+                        from: null,
+                        to: null,
+                        txFrom: [this.walletAddress]
+                    }
+                })
+                .then(this.handleFightData)
+                .catch((err) => {
+                    console.error(err, '查詢戰鬥數據失敗')
+                    return []
+                })
+        },
+        handleFightData({data: {data: {ethereum: {smartContractEvents}}}}) {
+            const calcData = (argument, value) => {
+                switch (argument) {
+                    case 'enemyType':
+                        return enemies[value].name
+                    case 'rewards':
+                        return value / 1000000000000000000
+                    default:
+                        return value
+                }
+            }
+            this.data = smartContractEvents.map(({arguments: attr, block}) => {
+                let obj = {}
+                attr.slice(1, 7).forEach(({argument, value}) => (obj[argument] = calcData(argument, value)))
+                obj.date = dayjs.unix(block.timestamp.unixtime).format('YYYY/MM/DD HH:mm:ss')
+                return obj
+            })
+        },
+        rowClassName(row) {
+            return !row.rewards ? 'table-fair' : ''
+        }
+    },
+    computed: {
+        tableData() {
+            if (this.filterHero || this.filterEnemyType) {
+                return this.data.filter(({_attackingHero, enemyType}) => {
+                    return (_attackingHero.includes(this.filterHero) || !this.filterHero) &&
+                    (enemyType.includes(this.filterEnemyType) || !this.filterEnemyType)
+                })
+            }
+            return this.data
+        },
+        fightCount() {
+            return this.tableData.length
+        },
+        fightSuccess() {
+            return this.tableData.filter(({rewards}) => rewards).length
+        },
+        fightFair() {
+            return this.fightCount - this.fightSuccess
+        }
+    }
+}
+</script>
+<style scoped>
+::v-deep .table-fair td{
+        background-color: #ff00006b;
+        color: #fff;
+    }
+</style>

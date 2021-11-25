@@ -22,12 +22,12 @@ const router = new Router({
         //     component: r => require.ensure([], () => r(require('@V/CalcGF')), 'CalcGF')
         // },
         {
-            path: '/ThreeBrother',
-            name: 'ThreeBrother',
+            path: '/FightData',
+            name: 'FightData',
             meta: {
-                title: '猜謎三兄弟'
+                title: '戰鬥數據'
             },
-            component: r => require.ensure([], () => r(require('@V/ThreeBrother')), 'ThreeBrother')
+            component: r => require.ensure([], () => r(require('@V/FightData')), 'FightData')
         }
     ]
 })

@@ -8,6 +8,12 @@
             >
                 英雄計算
             </router-link>
+            <router-link
+                class="link"
+                to="/FightData"
+            >
+                戰鬥數據
+            </router-link>
         </Sider>
         <Layout>
             <Header class="layout-header-bar">
