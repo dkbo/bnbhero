@@ -28,6 +28,14 @@ const router = new Router({
                 title: '戰鬥數據'
             },
             component: r => require.ensure([], () => r(require('@V/FightData')), 'FightData')
+        },
+        {
+            path: '/Sponsor',
+            name: 'Sponsor',
+            meta: {
+                title: '贊助'
+            },
+            component: r => require.ensure([], () => r(require('@V/Sponsor')), 'Sponsor')
         }
     ]
 })

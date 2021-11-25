@@ -144,7 +144,7 @@ export const calc = ({ card, build, gas }) => {
     const vdef = (lv - 1) * 10 + def + attr
     const vagi = (lv - 1) * 10 + agi + attr
     const hpcd = 86400 / 1000 * (100 + dishp) / 100
-    const everyDayHp = 86400 / hpcd
+    const everyDayHp = (86400 / hpcd).strip(4)
     return {
         buildData: {
             attr,
