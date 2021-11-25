@@ -1,8 +1,7 @@
 <template>
     <div class="container info">
         <div>祝您賺到更多BNB</div>
-        <br>
-        <div>錢包位址: 0x07a1e2B1580ed083f0b7d5FB024d597647579C74</div>
+        <div>錢包位址(BSC BEP20): 0x07a1e2B1580ed083f0b7d5FB024d597647579C74</div>
     </div>
 </template>
 <script>
