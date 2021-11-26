@@ -182,16 +182,17 @@ export default {
     },
     computed: {
         tableData() {
-            if (this.filterHero || this.filterEnemyType) {
-                return this.data.filter(({_attackingHero, enemyType}) => {
+            if (this.filterHero || this.filterEnemyType || this.endDate || this.startDate) {
+                const data = this.data.filter(({_attackingHero, enemyType}) => {
                     return (_attackingHero.includes(this.filterHero) || !this.filterHero) &&
                     (enemyType.includes(this.filterEnemyType) || !this.filterEnemyType)
                 })
-            }
-            if (this.endDate || this.startDate) {
-                const startDate = dayjs(this.startDate)
-                const endDate = dayjs(this.endDate)
-                return this.data.filter(({timestamp}) => startDate <= timestamp && timestamp <= endDate)
+                if (this.endDate || this.startDate) {
+                    const startDate = dayjs(this.startDate)
+                    const endDate = dayjs(this.endDate)
+                    return data.filter(({timestamp}) => startDate <= timestamp && timestamp <= endDate)
+                }
+                return data
             }
             return this.data
         },
