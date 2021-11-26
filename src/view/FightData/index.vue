@@ -1,16 +1,19 @@
 <template>
     <div class="container">
         <Row>
-            <Col span="6">
+            <Col span="4">
                 <Input v-model="walletAddress" placeholder="bsc 錢包位址" />
             </Col>
-            <Col span="6">
+            <Col span="4">
                 <Input v-model="filterHero" clearable placeholder="篩選英雄" />
             </Col>
-            <Col span="6">
+            <Col span="4">
                 <Input v-model="filterEnemyType" clearable placeholder="篩選敵人" />
             </Col>
-            <Col span="6">
+            <Col span="8">
+                <DatePicker type="datetimerange" format="yyyy-MM-dd HH:mm" placeholder="Select date and time(Excluding seconds)" style="width: 100%" @on-change="handleChangeDate" />
+            </Col>
+            <Col span="4">
                 <Button
                         :loading="isLoading"
                         type="success"
@@ -51,6 +54,8 @@ export default {
             filterEnemyType: '',
             network: 'bsc',
             eventType: 'Fight',
+            startDate: null,
+            endDate: null,
             columns: [
                 {
                     title: '英雄',
@@ -155,7 +160,9 @@ export default {
             this.data = smartContractEvents.map(({arguments: attr, block}) => {
                 let obj = {}
                 attr.slice(1, 7).forEach(({argument, value}) => (obj[argument] = calcData(argument, value)))
-                obj.date = dayjs.unix(block.timestamp.unixtime).format('YYYY/MM/DD HH:mm:ss')
+                const date = dayjs.unix(block.timestamp.unixtime)
+                obj.timestamp = date.valueOf()
+                obj.date = date.format('YYYY/MM/DD HH:mm:ss')
                 return obj
             })
             setStorage('walletAddress', this.walletAddress)
@@ -167,6 +174,10 @@ export default {
             console.log(data)
             this.filterHero = data._attackingHero
             this.filterEnemyType = data.enemyType
+        },
+        handleChangeDate([startDate, endDate]) {
+            this.startDate = startDate
+            this.endDate = endDate.replace('00:00', '23:59')
         }
     },
     computed: {
@@ -176,6 +187,11 @@ export default {
                     return (_attackingHero.includes(this.filterHero) || !this.filterHero) &&
                     (enemyType.includes(this.filterEnemyType) || !this.filterEnemyType)
                 })
+            }
+            if (this.endDate || this.startDate) {
+                const startDate = dayjs(this.startDate)
+                const endDate = dayjs(this.endDate)
+                return this.data.filter(({timestamp}) => startDate <= timestamp && timestamp <= endDate)
             }
             return this.data
         },

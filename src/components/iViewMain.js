@@ -14,7 +14,7 @@ import Button from 'iView/src/components/button'
 import Collapse from 'iView/src/components/collapse'
 // import ColorPicker from 'iView/src/components/color-picker'
 import Content from 'iView/src/components/content'
-// import DatePicker from 'iView/src/components/date-picker'
+import DatePicker from 'iView/src/components/date-picker'
 // import Dropdown from 'iView/src/components/dropdown'
 // import Footer from 'iView/src/components/footer'
 // import Form from 'iView/src/components/form'
@@ -72,7 +72,7 @@ const components = {
     Collapse,
     // ColorPicker,
     Content: Content,
-    // DatePicker,
+    DatePicker,
     // Dropdown,
     // DropdownItem: Dropdown.Item,
     // DropdownMenu: Dropdown.Menu,
