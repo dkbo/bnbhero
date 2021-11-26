@@ -13,21 +13,20 @@
              <Col span="4">
                 <Input v-model="filterMoney" clearable placeholder="價格小於" />
             </Col>
-            <Col span="4">
-                <Input v-model="page" clearable placeholder="最後幾筆" />
-            </Col>
-            <Col span="4">
+            <Col span="8">
                 <Button
                         :loading="isLoading"
                         type="success"
                         long
                         icon="ios-search"
-                        @click="getCharactersForPage"
+                        @click="getCharactersForPage()"
                     >
                         計算
                     </Button>
             </Col>
         </Row>
+        <Page :total="listings" :page-size="pageLimit" show-sizer :page-size-opts="[10, 20, 50, 200, 400]" @on-change="getCharactersForPage" @on-page-size-change="handlePageLimit" prev-text="Previous" next-text="Next" />
+
         <Table :columns="columns" :data="tableData"  />
     </div>
 </template>
@@ -45,11 +44,17 @@ export default {
             filterClass: getStorage('filterClass') || '',
             filterType: getStorage('filterType') || '',
             contractData: undefined,
-            page: getStorage('markPage') || 50,
+            pageLimit: getStorage('pageLimit') || 200,
+            listings: 0,
+            pages: 1,
             columns: [
                 {
                     title: '編號',
                     key: 'tokenId'
+                },
+                {
+                    title: '官方頁數',
+                    key: 'page'
                 },
                 {
                     title: '名字',
@@ -99,17 +104,27 @@ export default {
         const Web3 = await this.getWeb3()
         this.contractData = await new Web3.eth.Contract(abi, contract)
         // console.log('getCharacterDataById', data.methods.getCharacterDataById(23106).call().then(console.log))
-        this.getCharactersForPage()
+        this.getCharactersForPage(1)
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
     methods: {
-        async getCharactersForPage() {
+        async getCharactersForPage(pages = this.pages) {
+            this.pages = pages
             this.isLoading = true
-            const listings = await this.contractData.methods.getNumberOfCharacterListings().call()
-            const pages = Math.ceil(listings / +this.page) - 1
-            const markData = await this.contractData.methods.getCharactersForPage(+this.page, pages).call()
-            this.handleMarkData(markData)
-            this.isLoading = false
+            try {
+                this.listings = await this.contractData.methods.getNumberOfCharacterListings().call()
+                this.listings = +this.listings
+                const markData = await this.contractData.methods.getCharactersForPage(+this.pageLimit, pages - 1).call()
+                this.handleMarkData(markData)
+                this.isLoading = false
+            } catch (err) {
+                this.data = []
+                this.isLoading = false
+            }
+        },
+        handlePageLimit(pageLimit) {
+            this.pageLimit = pageLimit
+            this.getCharactersForPage(1)
         },
         // transfer() {
         //     let value = web3.util.toWei(1, 'bnb');
@@ -119,7 +134,7 @@ export default {
             return new Promise(async (resolve, reject) => {
                 const web3 = new Web3(window.ethereum)
                 try {
-                    await window.ethereum.enable()
+                    // await window.ethereum.enable()
                     resolve(web3)
                 } catch (err) {
                     reject(err)
@@ -133,13 +148,15 @@ export default {
                 obj2.priceText = obj2.price + ' BNB'
                 obj2.heroType = this.typeObj[obj2.heroType]
                 obj2.heroClass = this.classObj[obj2.heroClass]
+                const index = (this.pages - 1) * this.pageLimit + i + 1
+                obj2.page = Math.ceil(index / 12)
                 return obj2
             })
             setStorage('filterHero', this.filterHero)
             setStorage('filterMoney', this.filterMoney)
             setStorage('filterClass', this.filterClass)
             setStorage('filterType', this.filterType)
-            setStorage('markPage', this.page)
+            setStorage('pageLimit', this.pageLimit)
         }
 
     },
