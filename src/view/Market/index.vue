@@ -1,0 +1,182 @@
+<template>
+    <div class="container">
+        <Row>
+            <Col span="4">
+                <Input v-model="filterHero" clearable placeholder="篩選英雄" />
+            </Col>
+            <Col span="4">
+                <Input v-model="filterClass" clearable placeholder="篩選職業" />
+            </Col>
+            <Col span="4">
+                <Input v-model="filterType" clearable placeholder="篩選稀有度" />
+            </Col>
+             <Col span="4">
+                <Input v-model="filterMoney" clearable placeholder="價格小於" />
+            </Col>
+            <Col span="4">
+                <Input v-model="page" clearable placeholder="最後幾筆" />
+            </Col>
+            <Col span="4">
+                <Button
+                        :loading="isLoading"
+                        type="success"
+                        long
+                        icon="ios-search"
+                        @click="getCharactersForPage"
+                    >
+                        計算
+                    </Button>
+            </Col>
+        </Row>
+        <Table :columns="columns" :data="tableData"  />
+    </div>
+</template>
+<script>
+import Web3 from 'web3'
+import abi from './abi'
+import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
+export default {
+    name: 'Market',
+    data() {
+        return {
+            contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
+            filterHero: getStorage('filterHero') || '',
+            filterMoney: getStorage('filterMoney') || '',
+            filterClass: getStorage('filterClass') || '',
+            filterType: getStorage('filterType') || '',
+            contractData: undefined,
+            page: getStorage('markPage') || 50,
+            columns: [
+                {
+                    title: '編號',
+                    key: 'tokenId'
+                },
+                {
+                    title: '名字',
+                    key: 'name'
+                },
+                {
+                    title: '職業',
+                    key: 'heroClass'
+                },
+                {
+                    title: '稀有度',
+                    key: 'heroType'
+                },
+                {
+                    title: '等級',
+                    key: 'level'
+                },
+                {
+                    title: '經驗',
+                    key: 'xp'
+                },
+                {
+                    title: '價錢',
+                    key: 'price'
+                }
+            ],
+            data: [],
+            typeObj: {
+                1: '黃',
+                2: '綠',
+                3: '藍',
+                4: '紫',
+                5: '金'
+            },
+            classObj: {
+                1: '劍士',
+                2: '獵人',
+                3: '刺客',
+                4: '法師',
+                5: '騎士'
+            },
+            isLoading: true
+        }
+    },
+    async beforeMount() {
+        const contract = '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac'
+        const Web3 = await this.getWeb3()
+        this.contractData = await new Web3.eth.Contract(abi, contract)
+        // console.log('getCharacterDataById', data.methods.getCharacterDataById(23106).call().then(console.log))
+        this.getCharactersForPage()
+        // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
+    },
+    methods: {
+        async getCharactersForPage() {
+            this.isLoading = true
+            const listings = await this.contractData.methods.getNumberOfCharacterListings().call()
+            const pages = Math.ceil(listings / +this.page) - 1
+            const markData = await this.contractData.methods.getCharactersForPage(+this.page, pages).call()
+            this.handleMarkData(markData)
+            this.isLoading = false
+        },
+        // transfer() {
+        //     let value = web3.util.toWei(1, 'bnb');
+        //     var message =
+        // },
+        getWeb3() {
+            return new Promise(async (resolve, reject) => {
+                const web3 = new Web3(window.ethereum)
+                try {
+                    await window.ethereum.enable()
+                    resolve(web3)
+                } catch (err) {
+                    reject(err)
+                }
+            })
+        },
+        handleMarkData(data) {
+            this.data = data.map((obj, i) => {
+                let obj2 = {...obj}
+                obj2.price = (obj2.price / 1000000000000000000).toFixed(3)
+                obj2.priceText = obj2.price + ' BNB'
+                obj2.heroType = this.typeObj[obj2.heroType]
+                obj2.heroClass = this.classObj[obj2.heroClass]
+                return obj2
+            })
+            setStorage('filterHero', this.filterHero)
+            setStorage('filterMoney', this.filterMoney)
+            setStorage('filterClass', this.filterClass)
+            setStorage('filterType', this.filterType)
+            setStorage('markPage', this.page)
+        }
+
+    },
+    // armor: "310"
+    // attack: "610"
+    // heroClass: "2"
+    // heroType: "1"
+    // hp: "728"
+    // level: "2"
+    // name: "10"
+    // price: "440000000000000000"
+    // seller: "0x0107A72B078Fe548876Bb70F9b1b3fA7e81C7677"
+    // speed: "610"
+    // tokenId: "92041"
+    // xp: "2200"
+    computed: {
+        tableData() {
+            if (this.filterHero || this.filterMoney || this.filterClass || this.filterType) {
+                return this.data.filter(({name, heroClass, heroType, price}) => {
+                    return (name.includes(this.filterHero) || !this.filterHero) &&
+                    (heroClass.includes(this.filterClass) || !this.filterClass) &&
+                    (+this.filterMoney > +price || !this.filterMoney) &&
+                    (heroType.includes(this.filterType) || !this.filterType)
+                })
+            }
+            return this.data
+        }
+    }
+}
+</script>
+<style scoped>
+.info {
+    height: 100%;
+    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+</style>

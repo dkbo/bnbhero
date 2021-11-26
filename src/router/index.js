@@ -30,6 +30,14 @@ const router = new Router({
             component: r => require.ensure([], () => r(require('@V/FightData')), 'FightData')
         },
         {
+            path: '/Market',
+            name: 'Market',
+            meta: {
+                title: '市場數據'
+            },
+            component: r => require.ensure([], () => r(require('@V/Market')), 'Market')
+        },
+        {
             path: '/Sponsor',
             name: 'Sponsor',
             meta: {

@@ -14,7 +14,9 @@ module.exports = {
     globals: {
         _M: true,
         moment: true,
-        define: true
+        define: true,
+        ethereum: true,
+        web3: true
     },
     // required to lint *.vue files
     plugins: [

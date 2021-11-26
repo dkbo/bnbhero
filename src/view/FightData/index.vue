@@ -5,10 +5,10 @@
                 <Input v-model="walletAddress" placeholder="bsc 錢包位址" />
             </Col>
             <Col span="6">
-                <Input v-model="filterHero" placeholder="篩選英雄" />
+                <Input v-model="filterHero" clearable placeholder="篩選英雄" />
             </Col>
             <Col span="6">
-                <Input v-model="filterEnemyType" placeholder="篩選敵人" />
+                <Input v-model="filterEnemyType" clearable placeholder="篩選敵人" />
             </Col>
             <Col span="6">
                 <Button
@@ -28,10 +28,11 @@
                 戰鬥成功: {{fightSuccess}}
                 戰鬥失敗: {{fightFair}}
                 實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
+                總獎金: {{totalRewards}} BNB
             </Col>
         </Row>
 
-        <Table :row-class-name="rowClassName" :columns="columns" :data="tableData" />
+        <Table :row-class-name="rowClassName" :columns="columns" :data="tableData" @on-row-click="handleRowClick" />
     </div>
 </template>
 <script>
@@ -161,6 +162,11 @@ export default {
         },
         rowClassName(row) {
             return !row.rewards ? 'table-fair' : ''
+        },
+        handleRowClick(data) {
+            console.log(data)
+            this.filterHero = data._attackingHero
+            this.filterEnemyType = data.enemyType
         }
     },
     computed: {
@@ -181,6 +187,9 @@ export default {
         },
         fightFair() {
             return this.fightCount - this.fightSuccess
+        },
+        totalRewards() {
+            return this.tableData.reduce((rewards, {rewards: rewards2 = 0}) => rewards + rewards2, 0).toFixed(2)
         }
     }
 }
