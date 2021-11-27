@@ -1,2 +1,2 @@
 (window.webpackJsonp=window.webpackJsonp||[]).push([[4],{601:function(t,n,e){},897:function(t,n,e){"use strict";e(601)},904:function(t,n,e){"use strict";e.r(n);var i={name:"Sponsor"},s=(e(897),e(2)),c=Object(s.a)(i,(function(){var t=this.$createElement;this._self._c;return this._m(0)}),[function(){var t=this.$createElement,n=this._self._c||t;return n("div",{staticClass:"container info"},[n("div",[this._v("祝您賺到更多BNB")]),this._v(" "),n("div",[this._v("錢包位址(BSC BEP20): 0x07a1e2B1580ed083f0b7d5FB024d597647579C74")])])}],!1,null,"4223eb02",null);n.default=c.exports}}]);
-//# sourceMappingURL=Sponsor45ccd0c9f0f1c0e65588.js.map
+//# sourceMappingURL=Sponsore32e2ff7e52807483cd5.js.map

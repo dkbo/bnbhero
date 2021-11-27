@@ -12,7 +12,7 @@ const hero = [
         name: '稀有',
         arr: [
             {
-                name: 'Elrik The Imbuer (紫法)',
+                name: 'Elrik The Imbuer (紫賊)',
                 card: [900, 500, 500]
             }
         ]

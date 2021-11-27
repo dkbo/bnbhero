@@ -8,7 +8,7 @@
                         type="info"
                         long
                     >
-                        建築物等級
+                        建築物等級(Building Level)
                     </Button>
                 </Col>
             </Row>
@@ -22,7 +22,7 @@
                         type="info"
                         long
                     >
-                        卡片資料
+                        卡片資料(Card)
                     </Button>
                 </Col>
                 <Col span="8">
@@ -50,7 +50,7 @@
                         type="info"
                         long
                     >
-                        等級、攻、防、速
+                        等級(Level)、攻(atk)、防(def)、速(agi)
                     </Button>
                 </Col>
             </Row>
@@ -66,7 +66,7 @@
                         icon="ios-search"
                         @click="handleCalc"
                     >
-                        計算
+                        計算(calculate)
                     </Button>
                 </Col>
             </Row>

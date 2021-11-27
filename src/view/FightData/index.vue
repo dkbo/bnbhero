@@ -11,7 +11,7 @@
                 <Input v-model="filterEnemyType" clearable placeholder="篩選敵人" />
             </Col>
             <Col span="8">
-                <DatePicker type="datetimerange" format="yyyy-MM-dd HH:mm" placeholder="Select date and time(Excluding seconds)" style="width: 100%" @on-change="handleChangeDate" />
+                <DatePicker type="datetimerange" format="yyyy-MM-dd HH:mm" placeholder="篩選日期" style="width: 100%" @on-change="handleChangeDate" />
             </Col>
             <Col span="4">
                 <Button
@@ -218,8 +218,13 @@ export default {
     }
 .info {
     font-size: 16px;
-    padding: 10px 0;
+    padding: 10px;
     background: #67a95b;
     color: #ebebeb;
+}
+
+::v-deep .ivu-input,
+::v-deep .ivu-btn {
+    border-radius: 0;
 }
 </style>
