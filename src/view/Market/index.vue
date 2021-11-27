@@ -2,13 +2,17 @@
     <div class="container">
         <Row>
             <Col span="4">
-                <Input v-model="filterHero" clearable placeholder="篩選英雄" />
+                <Input v-model="filterHero" clearable placeholder="英雄" />
             </Col>
             <Col span="4">
-                <Input v-model="filterClass" clearable placeholder="篩選職業" />
+                <Select v-model="filterClass" placeholder="職業">
+                    <Option v-for="item in classObj" :value="item" :key="item">{{ item }}</Option>
+                </Select>
             </Col>
             <Col span="4">
-                <Input v-model="filterType" clearable placeholder="篩選稀有度" />
+                <Select v-model="filterType" placeholder="稀有度">
+                    <Option v-for="item in typeObj" :value="item" :key="item">{{ item }}</Option>
+                </Select>
             </Col>
              <Col span="4">
                 <Input v-model="filterMoney" clearable placeholder="價格小於" />
@@ -32,78 +36,78 @@
 </template>
 <script>
 import Web3 from 'web3'
-import abi from './abi'
+import abi from '@UTIL/abi'
 import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
 export default {
     name: 'Market',
     data() {
         return {
             contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
+            contractData: undefined,
             filterHero: getStorage('filterHero') || '',
             filterMoney: getStorage('filterMoney') || '',
             filterClass: getStorage('filterClass') || '',
             filterType: getStorage('filterType') || '',
-            contractData: undefined,
             pageLimit: getStorage('pageLimit') || 200,
             listings: 0,
             pages: 1,
             columns: [
                 {
-                    title: '編號',
+                    title: '編號 No.',
                     key: 'tokenId'
                 },
                 {
-                    title: '官方頁數',
+                    title: '官方頁數 Page',
                     key: 'page'
                 },
                 {
-                    title: '名字',
+                    title: '名字 Name',
                     key: 'name'
                 },
                 {
-                    title: '職業',
+                    title: '職業 Class',
                     key: 'heroClass'
                 },
                 {
-                    title: '稀有度',
+                    title: '稀有度 Type',
                     key: 'heroType'
                 },
                 {
-                    title: '等級',
+                    title: '等級 Level',
                     key: 'level'
                 },
                 {
-                    title: '經驗',
+                    title: '經驗 EXP',
                     key: 'xp'
                 },
                 {
-                    title: '價錢',
+                    title: '價錢 Price',
                     key: 'price'
                 }
             ],
             data: [],
             typeObj: {
-                1: '普通',
-                2: '罕見',
-                3: '稀有',
-                4: '史詩',
-                5: '傳說'
+                1: '普通 Common',
+                2: '罕見 Uncommon',
+                3: '稀有 Rare',
+                4: '史詩 Epic',
+                5: '傳說 Legendary'
             },
             classObj: {
-                1: '劍士',
-                2: '獵人',
-                3: '刺客',
-                4: '法師',
-                5: '騎士'
+                1: '士兵 Soldier',
+                2: '獵人 Hunter',
+                3: '刺客 Rogue',
+                4: '法師 Mage',
+                5: '騎士 Knight'
             },
             isLoading: true
         }
     },
     async beforeMount() {
-        const contract = '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac'
         const Web3 = await this.getWeb3()
-        this.contractData = await new Web3.eth.Contract(abi, contract)
-        // console.log('getCharacterDataById', data.methods.getCharacterDataById(23106).call().then(console.log))
+        this.contractData = await new Web3.eth.Contract(abi, this.contract)
+        // console.log(this.contractData)
+        // console.log('getCharacterDataById', this.contractData.methods.characters().call().then(console.log))
         this.getCharactersForPage(1)
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },

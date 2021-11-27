@@ -8,7 +8,7 @@
                         type="info"
                         long
                     >
-                        建築物等級(Building Level)
+                        建築物等級 Building Level
                     </Button>
                 </Col>
             </Row>
@@ -22,7 +22,7 @@
                         type="info"
                         long
                     >
-                        卡片資料(Card)
+                        卡片資料 Card
                     </Button>
                 </Col>
                 <Col span="8">
@@ -38,7 +38,7 @@
                     </Select>
                 </Col>
                 <Col span="8">
-                    <Input v-model="name" placeholder="英雄名稱" />
+                    <Input v-model="name" placeholder="英雄名稱 Hero Name" />
                 </Col>
                 <Col span="8">
                     <Input v-model="gas" placeholder="Gas" />
@@ -50,13 +50,13 @@
                         type="info"
                         long
                     >
-                        等級(Level)、攻(atk)、防(def)、速(agi)
+                        等級 Level、攻 atk、防 def、速 agi
                     </Button>
                 </Col>
             </Row>
             <CalcInput
                 :v="card"
-                :PH="['等級', '攻擊', '防禦', '速度']"
+                :PH="['等級 Level', '攻擊 Atk', '防禦 Def', '速度 Agi']"
             />
             <Row>
                 <Col span="24">
@@ -106,42 +106,36 @@ export default {
     data() {
         const storage = getStorage('HeroCalc') || []
         const heroColumns = {
-            title: '英雄素質',
+            title: '英雄素質 Hero Info',
             align: 'center',
             className: 'color5',
             children: [
                 {
-                    title: '回血CD',
+                    title: '回血CD HP CD',
                     key: 'hpcd',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '每日血量',
+                    title: '每日血量 Day HP',
                     key: 'everyDayHp',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '攻擊',
+                    title: '攻擊 Atk',
                     key: 'vatk',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '攻擊',
-                    key: 'vatk',
-                    align: 'center',
-                    className: 'color5'
-                },
-                {
-                    title: '防禦',
+                    title: '防禦 Def',
                     key: 'vdef',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '速度',
+                    title: '速度 Agi',
                     key: 'vagi',
                     align: 'center',
                     className: 'color5'
@@ -149,30 +143,30 @@ export default {
             ]
         }
         const buildColumns = {
-            title: '建築物加成',
+            title: '建築物加成 Building Buff',
             align: 'center',
             className: 'color5',
             children: [
                 {
-                    title: '屬性加成',
+                    title: '屬性 Attr',
                     key: 'attr',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '獎勵加成(%)',
+                    title: '獎勵(%) Rewards',
                     key: 'reward',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '扣血減少(%)',
+                    title: '扣血(%) hploss',
                     key: 'dishp',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: 'EXP加成',
+                    title: 'EXP',
                     key: 'exp',
                     align: 'center',
                     className: 'color5'
@@ -181,42 +175,42 @@ export default {
         }
 
         const enemiesColumns = {
-            title: '怪物數據',
+            title: '怪物數據 Enemies Data',
             align: 'center',
             className: 'color5',
             children: [
                 {
-                    title: '怪物名字',
+                    title: '怪物名字 Enemies ',
                     key: 'name',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '總成功率(%)',
+                    title: '總成功率(%) Success',
                     key: 'successC',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '戰鬥成功扣血量',
+                    title: '戰鬥成功扣血量 succesd Hploss',
                     key: 'hplossC',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '獎金',
+                    title: '獎金 Rewards',
                     key: 'rewardC',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '期望每天經驗',
+                    title: '期望每天經驗 Day XP',
                     key: 'everyXp',
                     align: 'center',
                     className: 'color5'
                 },
                 {
-                    title: '期望每天獎金',
+                    title: '期望每天獎金 Day Rewards',
                     key: 'everyRewrad',
                     align: 'center',
                     className: 'color5'

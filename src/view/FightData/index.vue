@@ -43,6 +43,8 @@ import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTI
 import axios from 'axios'
 import enemies from '@UTIL/enemies.js'
 import dayjs from 'dayjs'
+import Web3 from 'web3'
+import abi from '@UTIL/abi'
 export default {
     name: 'FightData',
     data() {
@@ -50,6 +52,8 @@ export default {
             api: 'https://graphql.bitquery.io',
             walletAddress: getStorage('walletAddress') || '',
             dataAddress: '0xde9fFb228C1789FEf3F08014498F2b16c57db855',
+            contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
+            contractData: undefined,
             filterHero: '',
             filterEnemyType: '',
             network: 'bsc',
@@ -58,38 +62,77 @@ export default {
             endDate: null,
             columns: [
                 {
-                    title: '英雄',
+                    title: '英雄 Hero',
                     key: '_attackingHero'
                 },
                 {
-                    title: '敵人',
+                    title: '職業 Class',
+                    key: 'heroClass'
+                },
+                {
+                    title: '稀有度 Type',
+                    key: 'heroType'
+                },
+                {
+                    title: '敵人 Enemies',
                     key: 'enemyType'
                 },
                 {
-                    title: '獎勵',
+                    title: '獎勵 Rewards',
                     key: 'rewards'
                 },
                 {
-                    title: '經驗值',
+                    title: '經驗值 EXP',
                     key: 'xpGained'
                 },
                 {
-                    title: '損血',
+                    title: '損血 Hploss',
                     key: 'hpLoss'
                 },
                 {
-                    title: '時間',
+                    title: '時間 Date',
                     key: 'date'
                 }
             ],
             data: [],
+            typeObj: {
+                1: '普通 Common',
+                2: '罕見 Uncommon',
+                3: '稀有 Rare',
+                4: '史詩 Epic',
+                5: '傳說 Legendary'
+            },
+            classObj: {
+                1: '士兵 Soldier',
+                2: '獵人 Hunter',
+                3: '刺客 Rogue',
+                4: '法師 Mage',
+                5: '騎士 Knight'
+            },
+            heroObj: {
+
+            },
             isLoading: false
         }
     },
-    beforeMount() {
+    async beforeMount() {
+        const Web3 = await this.getWeb3()
+        this.contractData = await new Web3.eth.Contract(abi, this.contract)
         this.walletAddress && this.handleCalc()
+        // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
     methods: {
+        getWeb3() {
+            return new Promise(async (resolve, reject) => {
+                const web3 = new Web3(window.ethereum)
+                try {
+                    // await window.ethereum.enable()
+                    resolve(web3)
+                } catch (err) {
+                    reject(err)
+                }
+            })
+        },
         async handleCalc() {
             this.isLoading = true
             const count = await this.fetchGetCount()
@@ -146,9 +189,12 @@ export default {
                     return []
                 })
         },
-        handleFightData({data: {data: {ethereum: {smartContractEvents}}}}) {
+        async handleFightData({data: {data: {ethereum: {smartContractEvents}}}}) {
             const calcData = (argument, value) => {
                 switch (argument) {
+                    case '_attackingHero':
+                        this.heroObj[value] = true
+                        return value
                     case 'enemyType':
                         return enemies[value].name
                     case 'rewards':
@@ -157,7 +203,8 @@ export default {
                         return value
                 }
             }
-            this.data = smartContractEvents.map(({arguments: attr, block}) => {
+            this.heroObj = {}
+            const data = smartContractEvents.map(({arguments: attr, block}) => {
                 let obj = {}
                 attr.slice(1, 7).forEach(({argument, value}) => (obj[argument] = calcData(argument, value)))
                 const date = dayjs.unix(block.timestamp.unixtime)
@@ -165,13 +212,21 @@ export default {
                 obj.date = date.format('YYYY/MM/DD HH:mm:ss')
                 return obj
             })
+            // 取得英雄資料
+            const arr = await this.contractData.methods.getCharacterDataByIds(Object.keys(this.heroObj)).call()
+            arr.forEach(obj => {
+                const obj2 = {...obj}
+                obj2.heroType = this.typeObj[obj2.heroType]
+                obj2.heroClass = this.classObj[obj2.heroClass]
+                this.heroObj[obj.tokenId] = {...obj2}
+            })
+            this.data = data.map(data => ({...data, ...this.heroObj[data._attackingHero]}))
             setStorage('walletAddress', this.walletAddress)
         },
         rowClassName(row) {
             return !row.rewards ? 'table-fair' : ''
         },
         handleRowClick(data) {
-            console.log(data)
             this.filterHero = data._attackingHero
             this.filterEnemyType = data.enemyType
         },
