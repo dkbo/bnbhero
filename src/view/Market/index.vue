@@ -5,12 +5,12 @@
                 <Input v-model="filterHero" clearable placeholder="英雄" />
             </Col>
             <Col span="4">
-                <Select v-model="filterClass" placeholder="職業">
+                <Select v-model="filterClass" clearable placeholder="職業">
                     <Option v-for="item in classObj" :value="item" :key="item">{{ item }}</Option>
                 </Select>
             </Col>
             <Col span="4">
-                <Select v-model="filterType" placeholder="稀有度">
+                <Select v-model="filterType" clearable placeholder="稀有度">
                     <Option v-for="item in typeObj" :value="item" :key="item">{{ item }}</Option>
                 </Select>
             </Col>
