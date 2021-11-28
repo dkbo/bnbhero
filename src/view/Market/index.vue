@@ -5,14 +5,10 @@
                 <Input v-model="filterHero" clearable placeholder="英雄" />
             </Col>
             <Col span="4">
-                <Select v-model="filterClass" clearable placeholder="職業">
-                    <Option v-for="item in classObj" :value="item" :key="item">{{ item }}</Option>
-                </Select>
+                <Input v-model="filterClass" clearable placeholder="職業" />
             </Col>
             <Col span="4">
-                <Select v-model="filterType" clearable placeholder="稀有度">
-                    <Option v-for="item in typeObj" :value="item" :key="item">{{ item }}</Option>
-                </Select>
+                <Input v-model="filterType" clearable placeholder="稀有度" />
             </Col>
              <Col span="4">
                 <Input v-model="filterMoney" clearable placeholder="價格小於" />
@@ -106,8 +102,8 @@ export default {
     async beforeMount() {
         const Web3 = await this.getWeb3()
         this.contractData = await new Web3.eth.Contract(abi, this.contract)
-        // console.log(this.contractData)
-        // console.log('getCharacterDataById', this.contractData.methods.characters().call().then(console.log))
+        console.log(this.contractData)
+        console.log('getCharacterDataById', this.contractData.methods.getCharacterDataById(2514).call().then(console.log))
         this.getCharactersForPage(1)
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
