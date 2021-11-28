@@ -31,7 +31,7 @@
     </div>
 </template>
 <script>
-import Web3 from 'web3'
+import Web3 from '@UTIL/web3'
 import abi from '@UTIL/abi'
 import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
 export default {
@@ -100,7 +100,6 @@ export default {
         }
     },
     async beforeMount() {
-        const Web3 = await this.getWeb3()
         this.contractData = await new Web3.eth.Contract(abi, this.contract)
         console.log(this.contractData)
         console.log('getCharacterDataById', this.contractData.methods.getCharacterDataById(2514).call().then(console.log))
@@ -125,21 +124,6 @@ export default {
         handlePageLimit(pageLimit) {
             this.pageLimit = pageLimit
             this.getCharactersForPage(1)
-        },
-        // transfer() {
-        //     let value = web3.util.toWei(1, 'bnb');
-        //     var message =
-        // },
-        getWeb3() {
-            return new Promise(async (resolve, reject) => {
-                const web3 = new Web3(window.ethereum)
-                try {
-                    // await window.ethereum.enable()
-                    resolve(web3)
-                } catch (err) {
-                    reject(err)
-                }
-            })
         },
         handleMarkData(data) {
             this.data = data.map((obj, i) => {

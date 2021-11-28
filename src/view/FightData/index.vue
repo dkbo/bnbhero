@@ -43,7 +43,7 @@ import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTI
 import axios from 'axios'
 import enemies from '@UTIL/enemies.js'
 import dayjs from 'dayjs'
-import Web3 from 'web3'
+import Web3 from '@UTIL/web3'
 import abi from '@UTIL/abi'
 export default {
     name: 'FightData',
@@ -116,23 +116,11 @@ export default {
         }
     },
     async beforeMount() {
-        const Web3 = await this.getWeb3()
         this.contractData = await new Web3.eth.Contract(abi, this.contract)
         this.walletAddress && this.handleCalc()
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
     methods: {
-        getWeb3() {
-            return new Promise(async (resolve, reject) => {
-                const web3 = new Web3(window.ethereum)
-                try {
-                    // await window.ethereum.enable()
-                    resolve(web3)
-                } catch (err) {
-                    reject(err)
-                }
-            })
-        },
         async handleCalc() {
             this.isLoading = true
             const count = await this.fetchGetCount()
