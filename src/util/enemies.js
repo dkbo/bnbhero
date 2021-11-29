@@ -18,7 +18,7 @@ const enemies = [
         success: 63,
         hploss: 200,
         exp: 120,
-        reward: 0.0462
+        reward: 0.00462
     },
     {
         name: 'Tier 2-1',
