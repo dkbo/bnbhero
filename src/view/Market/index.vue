@@ -2,6 +2,9 @@
     <div class="container">
         <Row>
             <Col span="4">
+                <Input v-model="filterNo" clearable placeholder="編號" />
+            </Col>
+            <Col span="4">
                 <Input v-model="filterHero" clearable placeholder="英雄" />
             </Col>
             <Col span="4">
@@ -13,7 +16,7 @@
              <Col span="4">
                 <Input v-model="filterMoney" clearable placeholder="價格小於" />
             </Col>
-            <Col span="8">
+            <Col span="4">
                 <Button
                         :loading="isLoading"
                         type="success"
@@ -40,6 +43,7 @@ export default {
         return {
             contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
             contractData: undefined,
+            filterNo: getStorage('filterNo') || '',
             filterHero: getStorage('filterHero') || '',
             filterMoney: getStorage('filterMoney') || '',
             filterClass: getStorage('filterClass') || '',
@@ -136,6 +140,7 @@ export default {
                 obj2.page = Math.ceil(index / 12)
                 return obj2
             })
+            setStorage('filterNo', this.filterNo)
             setStorage('filterHero', this.filterHero)
             setStorage('filterMoney', this.filterMoney)
             setStorage('filterClass', this.filterClass)
@@ -158,9 +163,10 @@ export default {
     // xp: "2200"
     computed: {
         tableData() {
-            if (this.filterHero || this.filterMoney || this.filterClass || this.filterType) {
-                return this.data.filter(({name, heroClass, heroType, price}) => {
-                    return (name.includes(this.filterHero) || !this.filterHero) &&
+            if (this.filterNo || this.filterHero || this.filterMoney || this.filterClass || this.filterType) {
+                return this.data.filter(({tokenId, name, heroClass, heroType, price}) => {
+                    return (tokenId.includes(this.filterNo) || !this.filterNo) &&
+                    (name.includes(this.filterHero) || !this.filterHero) &&
                     (heroClass.includes(this.filterClass) || !this.filterClass) &&
                     (+this.filterMoney > +price || !this.filterMoney) &&
                     (heroType.includes(this.filterType) || !this.filterType)

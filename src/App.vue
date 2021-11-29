@@ -20,10 +20,18 @@
             >
                 歡迎贊助
             </router-link>
+            <a
+                class="link"
+                href="https://github.com/dkbo/bnbhero"
+                target="_blank"
+            >
+                Github
+            </a>
         </Sider>
         <Layout>
             <Header class="layout-header-bar">
                 <h1 align="center">{{$route.meta.title}}</h1>
+
             </Header>
             <Content :style="{margin: '20px', background: '#fff'}">
                 <router-view  />
