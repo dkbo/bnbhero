@@ -2,6 +2,32 @@
     <div class="container">
         <Row>
             <Col span="3">
+                <Select v-model="params.rare" placeholder="稀有度" @change="getCharactersForPage(1)">
+                    <Option :value="0">All</Option>
+                    <Option v-for="(item, key) in typeObj" :value="key" :key="key+33">{{ item }}</Option>
+                </Select>
+            </Col>
+            <Col span="3">
+                <Select v-model="calcOrder" placeholder="排序條件">
+                    <Option v-for="(item, i) in orderArr" :value="i" :key="i">{{ item.text }}</Option>
+                </Select>
+            </Col>
+            <Col span="3">
+                <Button
+                    :loading="isLoading"
+                    type="success"
+                    long
+                    icon="ios-search"
+                    @click="getCharactersForPage()"
+                >
+                    計算
+                </Button>
+            </Col>
+        </Row>
+
+        <Page :total="listings" :page-size="+params.limit" show-sizer :page-size-opts="[10, 20, 50, 200, 400, 1000, 2000, 3000]" @on-change="getCharactersForPage" @on-page-size-change="handlePageLimit" prev-text="Previous" next-text="Next" />
+        <Row>
+            <Col span="3">
                 <Input v-model="filterNo" clearable placeholder="編號" />
             </Col>
             <Col span="3">
@@ -26,24 +52,12 @@
             <Col span="3">
                 <Input v-model="filterMoney" clearable placeholder="價格" />
             </Col>
-            <Col span="3">
-                <Button
-                        :loading="isLoading"
-                        type="success"
-                        long
-                        icon="ios-search"
-                        @click="getCharactersForPage()"
-                    >
-                        計算
-                    </Button>
-            </Col>
         </Row>
-        <Page :total="listings" :page-size="pageLimit" show-sizer :page-size-opts="[10, 20, 50, 200, 400]" @on-change="getCharactersForPage" @on-page-size-change="handlePageLimit" prev-text="Previous" next-text="Next" />
         <div class="flex">
             <div v-for="data in columns" class="center" :key="data.key">{{ data.title }}</div>
         </div>
         <VirtualList
-            style="height: calc(100vh - 234px); overflow-y: auto;"
+            style="height: calc(100vh - 270px); overflow-y: auto;"
             :data-key="'tokenId'"
             :data-sources="tableData"
             :data-component="item"
@@ -51,11 +65,13 @@
     </div>
 </template>
 <script>
-import Web3 from '@UTIL/web3'
-import abi from '@UTIL/abi'
+// import Web3 from '@UTIL/web3'
+import axios from 'axios'
+// import abi from '@UTIL/abi'
 import VirtualList from 'vue-virtual-scroll-list'
 import item from './item'
 import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
+
 export default {
     name: 'Market',
     components: {
@@ -64,7 +80,8 @@ export default {
     data() {
         return {
             item,
-            contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
+            api: 'https://bnbheroes.io/api/market.php',
+            // contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
             contractData: undefined,
             filterNo: getStorage('filterNo') || '',
             filterHero: getStorage('filterHero') || '',
@@ -73,9 +90,14 @@ export default {
             filterType: getStorage('filterType') || '',
             filterType2: getStorage('filterType2') || '',
             filterLevel: getStorage('filterLevel') || '',
-            pageLimit: getStorage('pageLimit') || 200,
             listings: 0,
-            pages: 1,
+            params: {
+                page: 0,
+                limit: getStorage('pageLimit') || 200,
+                rare: 0,
+                order: 'id',
+                dir: 'asc'
+            },
             columns: [
                 {
                     title: '編號 No.',
@@ -125,43 +147,57 @@ export default {
                 4: '法師 Mage',
                 5: '騎士 Knight'
             },
+            orderIndex: 0,
+            orderArr: [
+                {order: 'id', dir: 'asc', text: 'Oldest'},
+                {order: 'id', dir: 'desc', text: 'Newest'},
+                {order: 'price', dir: 'asc', text: 'Price Asc'},
+                {order: 'price', dir: 'desc', text: 'Price Desc'}
+            ],
             isLoading: true
         }
     },
     async beforeMount() {
-        this.contractData = await new Web3.eth.Contract(abi, this.contract)
+        // this.contractData = await new Web3.eth.Contract(abi, this.contract)
         // console.log(this.contractData)
         // console.log('getCharacterDataById', this.contractData.methods.getCharacterDataById(2514).call().then(console.log))
         this.getCharactersForPage(1)
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
     methods: {
-        async getCharactersForPage(pages = this.pages) {
-            this.pages = pages
+        async getCharactersForPage(pages) {
+            if (pages) {
+                this.params.page = pages - 1
+            }
             this.isLoading = true
             try {
-                this.listings = await this.contractData.methods.getNumberOfCharacterListings().call()
-                this.listings = +this.listings
-                const markData = await this.contractData.methods.getCharactersForPage(+this.pageLimit, pages - 1).call()
+                // this.listings = await this.contractData.methods.getNumberOfCharacterListings().call()
+                // const markData = await this.contractData.methods.getCharactersForPage(+this.pageLimit, pages - 1, 1, 1, 1).call()
+                const params = {...this.params}
+                if (!+params.rare) {
+                    params.rare = undefined
+                }
+                const {data} = await axios.get(this.api, {params})
+                const { data: markData, count } = data
+                this.listings = +count
                 this.handleMarkData(markData)
-                this.isLoading = false
             } catch (err) {
                 this.data = []
-                this.isLoading = false
             }
+            this.isLoading = false
         },
         handlePageLimit(pageLimit) {
-            this.pageLimit = pageLimit
+            this.params.limit = pageLimit
             this.getCharactersForPage(1)
         },
         handleMarkData(data) {
             this.data = data.map((obj, i) => {
                 let obj2 = {...obj}
-                obj2.price = (obj2.price / 1000000000000000000).toFixed(3)
                 obj2.priceText = obj2.price + ' BNB'
                 obj2.heroTypeName = this.typeObj[obj2.heroType]
                 obj2.heroClass = this.classObj[obj2.heroClass]
-                const index = (this.pages - 1) * this.pageLimit + i + 1
+                const index = this.params.page * this.params.limit + i + 1
+                console.log(index, 12)
                 obj2.page = Math.ceil(index / 12)
                 return obj2
             })
@@ -171,7 +207,7 @@ export default {
             setStorage('filterClass', this.filterClass)
             setStorage('filterType', this.filterType)
             setStorage('filterType2', this.filterType2)
-            setStorage('pageLimit', this.pageLimit)
+            setStorage('pageLimit', this.params.limit)
             setStorage('filterLevel', this.filterLevel)
         }
 
@@ -201,6 +237,17 @@ export default {
                 })
             }
             return this.data
+        },
+        calcOrder: {
+            get() {
+                return this.orderIndex
+            },
+            set(i) {
+                this.orderIndex = i
+                this.params.order = this.orderArr[i].order
+                this.params.dir = this.orderArr[i].dir
+                this.getCharactersForPage(1)
+            }
         }
     }
 }
