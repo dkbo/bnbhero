@@ -165,7 +165,9 @@ export default {
                     }) => smartContractEvents[0].count
                 )
                 .catch((err) => {
-                    console.error(err, '查詢戰鬥數據失敗')
+                    const message = '查詢戰鬥數據失敗，請過段時間再查詢'
+                    this.$Message.error(message)
+                    console.error(err, message)
                     return -1
                 })
         },
