@@ -14,9 +14,15 @@
             >
                 戰鬥數據
             </router-link>
+             <router-link
+                class="link"
+                to="/FightData"
+            >
+                市場數據
+            </router-link>
             <router-link
                 class="link"
-                to="/Sponsor"
+                to="/市場數據"
             >
                 歡迎贊助
             </router-link>
