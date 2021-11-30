@@ -197,7 +197,6 @@ export default {
                 obj2.heroTypeName = this.typeObj[obj2.heroType]
                 obj2.heroClass = this.classObj[obj2.heroClass]
                 const index = this.params.page * this.params.limit + i + 1
-                console.log(index, 12)
                 obj2.page = Math.ceil(index / 12)
                 return obj2
             })
