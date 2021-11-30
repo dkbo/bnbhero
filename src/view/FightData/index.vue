@@ -34,21 +34,34 @@
                 總獎金: {{totalRewards}} BNB
             </Col>
         </Row>
-
-        <Table :row-class-name="rowClassName" :columns="columns" :data="tableData" @on-row-click="handleRowClick" />
+        <div class="flex">
+            <div v-for="data in columns" :key="data.key">{{ data.title }}</div>
+        </div>
+        <VirtualList
+            style="height: calc(100vh - 234px); overflow-y: auto;"
+            :data-key="'date'"
+            :data-sources="tableData"
+            :data-component="item"
+        />
     </div>
 </template>
 <script>
 import { setStorage, getStorage, b64EncodeUnicode, b64DecodeUnicode } from '@UTIL'
 import axios from 'axios'
+import VirtualList from 'vue-virtual-scroll-list'
+import item from './item'
 import enemies from '@UTIL/enemies.js'
 import dayjs from 'dayjs'
 import Web3 from '@UTIL/web3'
 import abi from '@UTIL/abi'
 export default {
     name: 'FightData',
+    components: {
+        VirtualList
+    },
     data() {
         return {
+            item,
             api: 'https://graphql.bitquery.io',
             walletAddress: getStorage('walletAddress') || '',
             dataAddress: '0xde9fFb228C1789FEf3F08014498F2b16c57db855',
@@ -60,6 +73,7 @@ export default {
             eventType: 'Fight',
             startDate: null,
             endDate: null,
+            data: [],
             columns: [
                 {
                     title: '英雄 Hero',
@@ -94,7 +108,6 @@ export default {
                     key: 'date'
                 }
             ],
-            data: [],
             typeObj: {
                 1: '普通 Common',
                 2: '罕見 Uncommon',
@@ -269,5 +282,16 @@ export default {
 ::v-deep .ivu-input,
 ::v-deep .ivu-btn {
     border-radius: 0;
+}
+.flex {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  display: flex;
+  justify-content: space-around;
+  background: #f8f8f9;
+}
+.flex div {
+    width: 12.5%;
 }
 </style>
