@@ -22,7 +22,7 @@
             </router-link>
             <router-link
                 class="link"
-                to="/市場數據"
+                to="/Market"
             >
                 歡迎贊助
             </router-link>
