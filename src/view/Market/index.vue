@@ -87,8 +87,8 @@ export default {
             filterHero: getStorage('filterHero') || '',
             filterMoney: getStorage('filterMoney') || '',
             filterClass: getStorage('filterClass') || '',
-            filterType: getStorage('filterType') || 1,
-            filterType2: getStorage('filterType2') || 5,
+            filterType: getStorage('filterType') || '1',
+            filterType2: getStorage('filterType2') || '5',
             filterLevel: getStorage('filterLevel') || '',
             listings: 0,
             params: {
