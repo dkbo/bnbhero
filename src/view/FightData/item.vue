@@ -1,6 +1,6 @@
 <template>
     <div class="flex" :class="rowClassName">
-        <div v-for="data in columns" :key="data.key+source.date">{{ source[data.key] }}</div>
+        <div v-for="data in columns" @click="handleRowClick" :key="data.key+source.date">{{ source[data.key] }}</div>
     </div>
 </template>
 
@@ -55,6 +55,12 @@
               default () {
                   return {}
               }
+          }
+      },
+      methods: {
+          handleRowClick() {
+              this.$parent.$parent.$parent.filterHero = this.source._attackingHero
+              this.$parent.$parent.$parent.filterEnemyType = this.source.enemyType
           }
       }
   }

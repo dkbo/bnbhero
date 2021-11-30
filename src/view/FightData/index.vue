@@ -224,13 +224,6 @@ export default {
             this.data = data.map(data => ({...data, ...this.heroObj[data._attackingHero]}))
             setStorage('walletAddress', this.walletAddress)
         },
-        rowClassName(row) {
-            return !row.rewards ? 'table-fair' : ''
-        },
-        handleRowClick(data) {
-            this.filterHero = data._attackingHero
-            this.filterEnemyType = data.enemyType
-        },
         handleChangeDate([startDate, endDate]) {
             this.startDate = startDate
             this.endDate = endDate.replace('00:00', '23:59')
