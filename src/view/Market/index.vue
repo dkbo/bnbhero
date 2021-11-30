@@ -11,12 +11,12 @@
                 <Input v-model="filterClass" clearable placeholder="職業" />
             </Col>
             <Col span="3">
-                <Select v-model="filterType" clearable placeholder="稀有度以上">
+                <Select v-model="filterType" placeholder="稀有度以上">
                     <Option v-for="(item, key) in typeObj" :value="key" :key="key">{{ item }}</Option>
                 </Select>
             </Col>
             <Col span="3">
-                <Select v-model="filterType2" clearable placeholder="稀有度以下">
+                <Select v-model="filterType2" placeholder="稀有度以下">
                     <Option v-for="(item, key) in typeObj" :value="key" :key="item + key">{{ item }}</Option>
                 </Select>
             </Col>
