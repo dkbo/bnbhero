@@ -16,13 +16,13 @@
             </router-link>
              <router-link
                 class="link"
-                to="/FightData"
+                to="/Market"
             >
                 市場數據
             </router-link>
             <router-link
                 class="link"
-                to="/Market"
+                to="/Sponsor"
             >
                 歡迎贊助
             </router-link>
