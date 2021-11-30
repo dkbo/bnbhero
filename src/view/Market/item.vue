@@ -1,6 +1,6 @@
 <template>
     <div class="flex">
-        <div v-for="data in columns" :key="data.key+source.date">{{ source[data.key] }}</div>
+        <div v-for="data in columns" class="center" :class="data.classFn && data.classFn(source)" :key="data.key+source.date">{{ source[data.key] }}</div>
     </div>
 </template>
 
@@ -9,6 +9,13 @@
       name: 'item-component',
       data() {
           return {
+              typeObjClass: {
+                  1: '',
+                  2: 'green',
+                  3: 'blue',
+                  4: 'purple',
+                  5: 'orange'
+              },
               columns: [
                   {
                       title: '編號 No.',
@@ -28,7 +35,8 @@
                   },
                   {
                       title: '稀有度 Type',
-                      key: 'heroTypeName'
+                      key: 'heroTypeName',
+                      classFn: ({heroType}) => this.typeObjClass[heroType] + ' type'
                   },
                   {
                       title: '等級 Level',
@@ -40,7 +48,8 @@
                   },
                   {
                       title: '價錢 Price',
-                      key: 'price'
+                      key: 'price',
+                      classFn: () => 'right'
                   }
               ]
           }
@@ -70,8 +79,30 @@
 .flex div {
     width: 12.5%;
 }
-.fair {
-    background-color: #ff00006b;
-    color: #fff;
+.center {
+    text-align: center;
 }
+.right {
+    text-align: right;
+}
+.type {
+    font-weight: bold;
+}
+.green {
+    background: #6ea40f;
+    color: white;
+}
+.blue {
+    background: #2b83b5;
+    color: white;
+}
+.purple {
+    background: #bb55be;
+    color: white;
+}
+.orange {
+    background: #d97701;
+    color: white;
+}
+
 </style>

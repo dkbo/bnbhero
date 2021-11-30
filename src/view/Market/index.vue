@@ -40,7 +40,7 @@
         </Row>
         <Page :total="listings" :page-size="pageLimit" show-sizer :page-size-opts="[10, 20, 50, 200, 400]" @on-change="getCharactersForPage" @on-page-size-change="handlePageLimit" prev-text="Previous" next-text="Next" />
         <div class="flex">
-            <div v-for="data in columns" :key="data.key">{{ data.title }}</div>
+            <div v-for="data in columns" class="center" :key="data.key">{{ data.title }}</div>
         </div>
         <VirtualList
             style="height: calc(100vh - 234px); overflow-y: auto;"
@@ -200,7 +200,6 @@ export default {
                     (+level >= +this.filterLevel || !this.filterLevel)
                 })
             }
-            console.log(this.data)
             return this.data
         }
     }
@@ -225,5 +224,8 @@ export default {
 }
 .flex div {
     width: 12.5%;
+}
+.center {
+    text-align: center;
 }
 </style>
