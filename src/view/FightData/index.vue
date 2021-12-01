@@ -141,8 +141,13 @@ export default {
             this.isLoading = false
         },
         fetchGetCount() {
-            return axios
-                .post(this.api, {
+            return axios({
+                method: 'post',
+                url: this.api,
+                headers: {
+                    'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
+                },
+                data: {
                     query: 'query ($network: EthereumNetwork!, $address: String!, $eventType: String!, $limit: Int!, $offset: Int!, $from: ISO8601DateTime, $to: ISO8601DateTime, $txFrom: [String!]) {\n  ethereum(network: $network) {\n    smartContractEvents(\n      options: {limit: $limit, offset: $offset}\n      date: {since: $from, till: $to}\n      txFrom: {in: $txFrom}\n      smartContractAddress: {is: $address}\n      smartContractEvent: {is: $eventType}\n    ) {\n      count(smartContractEvent: {is: $eventType})\n      __typename\n    }\n    __typename\n  }\n}',
                     variables: {
                         network: this.network,
@@ -154,7 +159,8 @@ export default {
                         to: null,
                         txFrom: [this.walletAddress]
                     }
-                })
+                }
+            })
                 .then(
                     ({
                         data: {
@@ -172,8 +178,13 @@ export default {
                 })
         },
         fetchGetFightData(limit) {
-            return axios
-                .post(this.api, {
+            return axios({
+                method: 'post',
+                url: this.api,
+                headers: {
+                    'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
+                },
+                data: {
                     query: 'query ($network: EthereumNetwork!, $address: String!, $eventType: String!, $limit: Int!, $offset: Int!, $from: ISO8601DateTime, $to: ISO8601DateTime, $txFrom: [String!]) {\n  ethereum(network: $network) {\n    smartContractEvents(\n      options: {desc: "block.height", limit: $limit, offset: $offset}\n      date: {since: $from, till: $to}\n      txFrom: {in: $txFrom}\n      smartContractAddress: {is: $address}\n      smartContractEvent: {is: $eventType}\n    ) {\n      smartContractEvent {\n        name\n        __typename\n      }\n      block {\n        height\n        timestamp {\n          iso8601\n          unixtime\n          __typename\n        }\n        __typename\n      }\n      arguments {\n        value\n        argument\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
                     variables: {
                         network: this.network,
@@ -185,7 +196,8 @@ export default {
                         to: null,
                         txFrom: [this.walletAddress]
                     }
-                })
+                }
+            })
                 .then(this.handleFightData)
                 .catch((err) => {
                     console.error(err, '查詢戰鬥數據失敗')
