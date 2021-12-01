@@ -120,7 +120,7 @@ const getReward = v => +v === 2
 const getDishp = v => +v === 2
     ? -5
     : +v === 3
-        ? -12
+        ? -13
         : +v === 4
             ? -28
             : 0

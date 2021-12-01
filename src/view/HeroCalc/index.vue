@@ -293,4 +293,8 @@ export default {
 </script>
 <style scoped>
 
+::v-deep .ivu-select-group-title {
+  background: #2db7f5;
+  color: white;
+}
 </style>
