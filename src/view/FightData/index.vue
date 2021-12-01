@@ -79,14 +79,14 @@ export default {
                     title: '英雄 Hero',
                     key: '_attackingHero'
                 },
-                {
-                    title: '職業 Class',
-                    key: 'heroClass'
-                },
-                {
-                    title: '稀有度 Type',
-                    key: 'heroType'
-                },
+                // {
+                //     title: '職業 Class',
+                //     key: 'heroClass'
+                // },
+                // {
+                //     title: '稀有度 Type',
+                //     key: 'heroType'
+                // },
                 {
                     title: '敵人 Enemies',
                     key: 'enemyType'
@@ -228,14 +228,15 @@ export default {
                 return obj
             })
             // 取得英雄資料
-            const arr = await this.contractData.methods.getCharacterDataByIds(Object.keys(this.heroObj)).call()
-            arr.forEach(obj => {
-                const obj2 = {...obj}
-                obj2.heroType = this.typeObj[obj2.heroType]
-                obj2.heroClass = this.classObj[obj2.heroClass]
-                this.heroObj[obj.tokenId] = {...obj2}
-            })
-            this.data = data.map(data => ({...data, ...this.heroObj[data._attackingHero]}))
+            // const arr = await this.contractData.methods.getCharacterDataByIds(Object.keys(this.heroObj)).call()
+            // arr.forEach(obj => {
+            //     const obj2 = {...obj}
+            //     obj2.heroType = this.typeObj[obj2.heroType]
+            //     obj2.heroClass = this.classObj[obj2.heroClass]
+            //     this.heroObj[obj.tokenId] = {...obj2}
+            // })
+            // this.data = data.map(data => ({...data, ...this.heroObj[data._attackingHero]}))
+            this.data = data
             setStorage('walletAddress', this.walletAddress)
         },
         handleChangeDate([startDate, endDate]) {

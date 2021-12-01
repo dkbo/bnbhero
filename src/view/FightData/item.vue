@@ -14,14 +14,14 @@
                       title: '英雄 Hero',
                       key: '_attackingHero'
                   },
-                  {
-                      title: '職業 Class',
-                      key: 'heroClass'
-                  },
-                  {
-                      title: '稀有度 Type',
-                      key: 'heroType'
-                  },
+                  //   {
+                  //       title: '職業 Class',
+                  //       key: 'heroClass'
+                  //   },
+                  //   {
+                  //       title: '稀有度 Type',
+                  //       key: 'heroType'
+                  //   },
                   {
                       title: '敵人 Enemies',
                       key: 'enemyType'
