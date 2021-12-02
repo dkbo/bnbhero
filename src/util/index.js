@@ -174,7 +174,7 @@ export const calcEnemies = ({ cardData, buildData, gas }) => {
         // Valult加成獎勵
         const valultReward = enemiesReward * (100 + buildReward) / 100
         // 速度加成獎勵
-        const speedReward = vagi * valultReward / 1000
+        const speedReward = vagi * valultReward / 2000
         // 總獎金
         const rewardC = valultReward + speedReward
         // 戰鬥成功扣血量
