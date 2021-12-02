@@ -12,7 +12,7 @@
               columns: [
                   {
                       title: '英雄 Hero',
-                      key: '_attackingHero'
+                      key: '_heroId'
                   },
                   //   {
                   //       title: '職業 Class',
@@ -39,11 +39,19 @@
                       key: 'hpLoss'
                   },
                   {
+                      title: '燃料費 Gas',
+                      key: 'gasValue'
+                  },
+                  {
                       title: '時間 Date',
                       key: 'date'
                   }
               ],
-              rowClassName: !this.source.rewards ? 'fair' : ''
+              rowClassName: !this.source.rewards
+                  ? this.source.hpLoss
+                      ? 'fair'
+                      : 'others'
+                  : ''
           }
       },
       props: {
@@ -59,7 +67,7 @@
       },
       methods: {
           handleRowClick() {
-              this.$parent.$parent.$parent.filterHero = this.source._attackingHero
+              this.$parent.$parent.$parent.filterHero = this.source._heroId
               this.$parent.$parent.$parent.filterEnemyType = this.source.enemyType
           }
       }
@@ -79,6 +87,10 @@
 }
 .fair {
     background-color: #ff00006b;
+    color: #fff;
+}
+.others {
+    background-color: #67a95b;
     color: #fff;
 }
 </style>

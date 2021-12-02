@@ -31,7 +31,11 @@
                 戰鬥成功: {{fightSuccess}}
                 戰鬥失敗: {{fightFair}}
                 實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
-                總獎金: {{totalRewards}} BNB
+            </Col>
+            <Col span="24" class="info2">
+                獎金(BNB): {{totalRewards.toFixed(4)}}
+                瓦斯費(BNB): {{successGas.toFixed(4)}}
+                失敗瓦斯費(BNB)(只篩選日期時間): {{fairGas.toFixed(4)}}
             </Col>
         </Row>
         <div class="flex">
@@ -77,7 +81,7 @@ export default {
             columns: [
                 {
                     title: '英雄 Hero',
-                    key: '_attackingHero'
+                    key: '_heroId'
                 },
                 // {
                 //     title: '職業 Class',
@@ -104,6 +108,10 @@ export default {
                     key: 'hpLoss'
                 },
                 {
+                    title: '燃料費 Gas',
+                    key: 'gasValue'
+                },
+                {
                     title: '時間 Date',
                     key: 'date'
                 }
@@ -125,6 +133,8 @@ export default {
             heroObj: {
 
             },
+            successTrs: [],
+            fairTrs: [],
             isLoading: false
         }
     },
@@ -136,8 +146,8 @@ export default {
     methods: {
         async handleCalc() {
             this.isLoading = true
-            const count = await this.fetchGetCount()
-            await this.fetchGetFightData(count)
+            // const count = await this.fetchGetCount()
+            await this.fetchGetFightData()
             this.isLoading = false
         },
         fetchGetCount() {
@@ -177,7 +187,7 @@ export default {
                     return -1
                 })
         },
-        fetchGetFightData(limit) {
+        fetchGetFightData() {
             return axios({
                 method: 'post',
                 url: this.api,
@@ -185,15 +195,50 @@ export default {
                     'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
                 },
                 data: {
-                    query: 'query ($network: EthereumNetwork!, $address: String!, $eventType: String!, $limit: Int!, $offset: Int!, $from: ISO8601DateTime, $to: ISO8601DateTime, $txFrom: [String!]) {\n  ethereum(network: $network) {\n    smartContractEvents(\n      options: {desc: "block.height", limit: $limit, offset: $offset}\n      date: {since: $from, till: $to}\n      txFrom: {in: $txFrom}\n      smartContractAddress: {is: $address}\n      smartContractEvent: {is: $eventType}\n    ) {\n      smartContractEvent {\n        name\n        __typename\n      }\n      block {\n        height\n        timestamp {\n          iso8601\n          unixtime\n          __typename\n        }\n        __typename\n      }\n      arguments {\n        value\n        argument\n        __typename\n      }\n      __typename\n    }\n    __typename\n  }\n}',
+                    query: `
+                    query ($network: EthereumNetwork!, $bnbHeroAddress: String!, $limit: Int!, $offset: Int!, $startDate: ISO8601DateTime, $endDate: ISO8601DateTime, $txFrom: [String!]) {
+                        ethereum(network: $network) {
+                            transactions(
+                            txSender: {in: $txFrom}
+                            txTo: {is: $bnbHeroAddress}
+                            options: {desc: "block.height", limit: $limit, offset: $offset}
+                            ) {
+                            block {
+                                height
+                                timestamp {
+                                unixtime
+                                }
+                            }
+                            gasValue
+                            success
+                            }
+                            smartContractEvents(
+                            options: {desc: "block.height", limit: $limit, offset: $offset}
+                            txFrom: {in: $txFrom}
+                            smartContractAddress: {is: $bnbHeroAddress}
+                            date: {since: $startDate, till: $endDate}
+                            ) {
+                            block {
+                                height
+                                timestamp {
+                                unixtime
+                                }
+                            }
+                            arguments {
+                                value
+                                argument
+                            }
+                            }
+                        }
+                        }
+                    `,
                     variables: {
                         network: this.network,
-                        address: this.dataAddress,
-                        eventType: this.eventType,
+                        bnbHeroAddress: this.dataAddress,
                         offset: 0,
-                        limit,
-                        from: null,
-                        to: null,
+                        limit: 100000,
+                        startDate: null,
+                        endDate: null,
                         txFrom: [this.walletAddress]
                     }
                 }
@@ -204,10 +249,23 @@ export default {
                     return []
                 })
         },
-        async handleFightData({data: {data: {ethereum: {smartContractEvents}}}}) {
-            const calcData = (argument, value) => {
+        async handleFightData({data: {data: {ethereum: {smartContractEvents, transactions}}}}) {
+            this.handleTransactions(transactions)
+            this.handleEventsData(smartContractEvents)
+            setStorage('walletAddress', this.walletAddress)
+        },
+        handleEventsData(smartContractEvents) {
+            const calcData = (argument, value, obj) => {
                 switch (argument) {
+                    case 'townType':
+                        obj.enemyType = `Town ${value} Level up`
+                        return value
+                    case 'level':
+                        !obj.enemyType && (obj.enemyType = `Unlocked Level ${value}`)
+                        return value
                     case '_attackingHero':
+                    case 'heroId':
+                        obj._heroId = value
                         this.heroObj[value] = true
                         return value
                     case 'enemyType':
@@ -218,13 +276,21 @@ export default {
                         return value
                 }
             }
+            // 0: {value: "29390", argument: "_heroId"}
+            // 1: {value: "0x2d96a2c38e66d7c6837c97096c1ff8d2bc4cab05", argument: "player"}
+            // 2: {value: "29390", argument: "_heroId"}
+            // 3: {value: "11", argument: "level"}
             this.heroObj = {}
-            const data = smartContractEvents.map(({arguments: attr, block}) => {
+            const data = smartContractEvents.map(({arguments: attr, block}, index) => {
                 let obj = {}
-                attr.slice(1, 7).forEach(({argument, value}) => (obj[argument] = calcData(argument, value)))
+                attr.forEach(({argument, value}) => (obj[argument] = calcData(argument, value, obj)))
                 const date = dayjs.unix(block.timestamp.unixtime)
                 obj.timestamp = date.valueOf()
                 obj.date = date.format('YYYY/MM/DD HH:mm:ss')
+                obj.gasValue = this.successTrs[index].gasValue
+                if (!obj.enemyType) {
+                    obj.enemyType = 'Others'
+                }
                 return obj
             })
             // 取得英雄資料
@@ -237,7 +303,11 @@ export default {
             // })
             // this.data = data.map(data => ({...data, ...this.heroObj[data._attackingHero]}))
             this.data = data
-            setStorage('walletAddress', this.walletAddress)
+        },
+        handleTransactions(transactions) {
+            this.successTrs = []
+            this.fairTrs = []
+            transactions.forEach(data => data.success ? this.successTrs.push(data) : this.fairTrs.push(data))
         },
         handleChangeDate([startDate, endDate]) {
             this.startDate = startDate
@@ -247,8 +317,8 @@ export default {
     computed: {
         tableData() {
             if (this.filterHero || this.filterEnemyType || this.endDate || this.startDate) {
-                const data = this.data.filter(({_attackingHero, enemyType}) => {
-                    return (_attackingHero.includes(this.filterHero) || !this.filterHero) &&
+                const data = this.data.filter(({_heroId = '', enemyType}) => {
+                    return (_heroId.includes(this.filterHero) || !this.filterHero) &&
                     (enemyType.includes(this.filterEnemyType) || !this.filterEnemyType)
                 })
                 if (this.endDate || this.startDate) {
@@ -258,10 +328,22 @@ export default {
                 }
                 return data
             }
+
             return this.data
         },
+        fairGasData() {
+            if (this.endDate || this.startDate) {
+                const startDate = dayjs(this.startDate)
+                const endDate = dayjs(this.endDate)
+                return this.fairTrs.filter(({block}) => {
+                    const timestamp = dayjs.unix(block.timestamp.unixtime)
+                    return startDate <= timestamp && timestamp <= endDate
+                })
+            }
+            return this.fairTrs
+        },
         fightCount() {
-            return this.tableData.length
+            return this.tableData.filter(({hpLoss}) => hpLoss).length
         },
         fightSuccess() {
             return this.tableData.filter(({rewards}) => rewards).length
@@ -270,7 +352,13 @@ export default {
             return this.fightCount - this.fightSuccess
         },
         totalRewards() {
-            return this.tableData.reduce((rewards, {rewards: rewards2 = 0}) => rewards + rewards2, 0).toFixed(2)
+            return this.tableData.reduce((value, {rewards = 0}) => value + rewards, 0)
+        },
+        successGas() {
+            return this.tableData.reduce((value, {gasValue = 0}) => value + gasValue, 0)
+        },
+        fairGas() {
+            return this.fairGasData.reduce((value, {gasValue = 0}) => value + gasValue, 0)
         }
     }
 }
@@ -282,11 +370,16 @@ export default {
     }
 .info {
     font-size: 16px;
-    padding: 10px;
+    padding: 5px;
     background: #67a95b;
-    color: #ebebeb;
+    color: #e1e1e1;
 }
-
+.info2 {
+    font-size: 16px;
+    padding: 5px;
+    background: #495060;
+    color: #c3c3c3;
+}
 ::v-deep .ivu-input,
 ::v-deep .ivu-btn {
     border-radius: 0;
