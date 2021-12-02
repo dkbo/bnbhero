@@ -178,7 +178,7 @@ export const calcEnemies = ({ cardData, buildData, gas }) => {
         // 總獎金
         const rewardC = valultReward + speedReward
         // 戰鬥成功扣血量
-        const hplossC = Math.ceil(hploss - vdef / 30)
+        const hplossC = Math.ceil(hploss - vdef / 20)
         // 每天計算次數
         const everyHit = everyDayHp / (((100 - successC) * hploss + successC * hplossC) / 100)
         // 單次期望經驗
