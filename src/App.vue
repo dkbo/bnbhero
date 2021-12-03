@@ -10,6 +10,12 @@
             </router-link>
             <router-link
                 class="link"
+                to="/HeroHighCalc"
+            >
+                英雄模擬計算
+            </router-link>
+            <router-link
+                class="link"
                 to="/FightData"
             >
                 戰鬥數據

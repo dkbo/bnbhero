@@ -13,14 +13,14 @@ const router = new Router({
             },
             component: r => require.ensure([], () => r(require('@V/HeroCalc')), 'HeroCalc')
         },
-        // {
-        //     path: '/CalcGF',
-        //     name: 'CalcGF',
-        //     meta: {
-        //         title: '四圍算檔次'
-        //     },
-        //     component: r => require.ensure([], () => r(require('@V/CalcGF')), 'CalcGF')
-        // },
+        {
+            path: '/HeroHighCalc',
+            name: 'HeroHighCalc',
+            meta: {
+                title: '英雄進階計算'
+            },
+            component: r => require.ensure([], () => r(require('@V/HeroHighCalc')), 'HeroHighCalc')
+        },
         {
             path: '/FightData',
             name: 'FightData',

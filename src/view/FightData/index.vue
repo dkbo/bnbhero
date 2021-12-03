@@ -42,7 +42,7 @@
             <div v-for="data in columns" :key="data.key">{{ data.title }}</div>
         </div>
         <VirtualList
-            style="height: calc(100vh - 234px); overflow-y: auto;"
+            style="height: calc(100vh - 258px); overflow-y: auto;"
             :data-key="'date'"
             :data-sources="tableData"
             :data-component="item"
