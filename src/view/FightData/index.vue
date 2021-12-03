@@ -192,7 +192,8 @@ export default {
                 method: 'post',
                 url: this.api,
                 headers: {
-                    'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
+                    'X-API-KEY': 'BQY9CL2tSIpvHACqoXpQCHgps5ditUG3'
+                    // 'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
                 },
                 data: {
                     query: `
