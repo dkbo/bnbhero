@@ -21,14 +21,14 @@ const router = new Router({
             },
             component: r => require.ensure([], () => r(require('@V/HeroHighCalc')), 'HeroHighCalc')
         },
-        // {
-        //     path: '/FightData',
-        //     name: 'FightData',
-        //     meta: {
-        //         title: '戰鬥數據'
-        //     },
-        //     component: r => require.ensure([], () => r(require('@V/FightData')), 'FightData')
-        // },
+        {
+            path: '/FightData',
+            name: 'FightData',
+            meta: {
+                title: '戰鬥數據'
+            },
+            component: r => require.ensure([], () => r(require('@V/FightData')), 'FightData')
+        },
         {
             path: '/Market',
             name: 'Market',

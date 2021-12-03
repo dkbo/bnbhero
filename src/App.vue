@@ -14,12 +14,12 @@
             >
                 英雄模擬計算
             </router-link>
-            <!-- <router-link
+            <router-link
                 class="link"
                 to="/FightData"
             >
                 戰鬥數據
-            </router-link> -->
+            </router-link>
              <router-link
                 class="link"
                 to="/Market"

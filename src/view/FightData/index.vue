@@ -57,7 +57,7 @@ import item from './item'
 import enemies from '@UTIL/enemies.js'
 import dayjs from 'dayjs'
 import Web3 from '@UTIL/web3'
-import abi from '@UTIL/abi'
+import abi from '@UTIL/fightAbi'
 export default {
     name: 'FightData',
     components: {
@@ -139,8 +139,57 @@ export default {
         }
     },
     async beforeMount() {
-        this.contractData = await new Web3.eth.Contract(abi, this.contract)
-        this.walletAddress && this.handleCalc()
+        this.contractData = await new Web3.eth.Contract(abi, this.dataAddress)
+        console.log(this.contractData)
+        const aa = '0x2D96A2C38e66d7C6837c97096C1ff8D2bC4CaB05'
+        var options = {
+            // fromBlock: 0,
+            filter: {exp: '490'},
+            address: [this.dataAddress],
+            topics: '0xfd43ade1c09fade1c0d57a7af66ab4ead7c2c2eb7b11a91ffdd57a7af66ab4ead7'
+        }
+        this.contractData.getPastEvents('allEvents', options)
+            .then(function(events) {
+                console.log(events) // same results as the optional callback above
+            })
+        // Web3.eth.subscribe('logs', options, function (error, result) {
+        //     if (!error) { console.log(result) }
+        // })
+        //     .on('data', function (log) {
+        //         console.log(log)
+        //     })
+        //     .on('changed', function (log) {
+        //     })
+        // this.walletAddress && this.handleCalc()
+        // Web3.eth.getPastLogs(options).then((data) => {
+        //     const typesArray = [
+        //         {
+        //             type: 'uint256',
+        //             name: 'player'
+        //         },
+        //         {
+        //             type: 'uint256',
+        //             name: 'hero'
+        //         },
+        //         {
+        //             type: 'uint256',
+        //             name: 'enemyType'
+        //         },
+        //         {
+        //             type: 'uint256',
+        //             name: 'rewards'
+        //         },
+        //         {
+        //             type: 'uint256',
+        //             name: 'exp'
+        //         },
+        //         {
+        //             type: 'uint256',
+        //             name: 'hpLoss'
+        //         }
+        //     ]
+        //     console.log(data, Web3.eth.abi.decodeLog(typesArray, data[1].data))
+        // })
         // v.c.methods.getCharactersForPage(Ae, e).call().then((function(e)
     },
     methods: {
