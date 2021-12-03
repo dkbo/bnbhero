@@ -1,6 +1,9 @@
 <template>
-    <div class="flex" :class="rowClassName">
-        <div v-for="data in columns2" :key="data.key+source.date">{{ source[data.key] }}</div>
+    <div class="row" :class="rowClassName">
+        <div class="flex" >
+            <div v-for="data in columns" :key="data.key+source.date">{{ source[data.key] }}</div>
+        </div>
+        <div class="log">{{source.log}}</div>
     </div>
 </template>
 
@@ -10,6 +13,14 @@
       data() {
           return {
               columns: [
+                  {
+                      title: '等級 Level',
+                      key: 'lv'
+                  },
+                  {
+                      title: '英雄經驗 Hero Exp',
+                      key: 'totalExp'
+                  },
                   {
                       title: '獎勵 Rewards',
                       key: 'rewards'
@@ -61,19 +72,30 @@
 </script>
 
 <style scoped>
-
-.flex {
-  font-size: 16px;
-  padding: 12px;
-  display: flex;
-  justify-content: space-around;
+.row {
+    /* margin-bottom: 20px; */
 }
-.fair {
+.flex {
+    font-size: 16px;
+    padding: 12px;
+    display: flex;
+    justify-content: space-around;
+}
+.log {
+    font-size: 16px;
+    padding: 12px;
+    background-color: #67a95b;
+    color: #fff;
+}
+.flex div {
+    width: 16.666%;
+}
+.fair .log{
     background-color: #ff00006b;
     color: #fff;
 }
-.others {
-    background-color: #67a95b;
+.others .log{
+    background-color: #5378b1;
     color: #fff;
 }
 </style>

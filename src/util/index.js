@@ -268,15 +268,23 @@ export const calcFight = ({ card, cardData, buildData, gas, totalHp, enemyType }
     let arr = []
     let lv = initLv
     let hp = +totalHp
-    let exp = initExp
+    let totalExp = initExp
     let count = 0
     let atk = vatk
     let def = vdef
     let agi = vagi
+    let maxSuccess = 0
+    let successCount = 0
+    let maxFair = 0
+    let fairCount = 0
     const calc = () => {
         count++
         if (hp < enemyHploss) {
-            return arr
+            return {
+                arr,
+                maxSuccess,
+                maxFair
+            }
         }
         // 總成功率
         const successC = (success + (vatk / 100)) * 10
@@ -288,11 +296,15 @@ export const calcFight = ({ card, cardData, buildData, gas, totalHp, enemyType }
         const hploss = calcHploss(enemyHploss, def)
         const isSuccess = Math.floor((Math.random() * 1000 + 1) % 1000) < successC
         if (isSuccess) {
+            fairCount = 0
+            if (maxSuccess < ++successCount) {
+                maxSuccess = successCount
+            }
             hp -= hploss
-            exp += successExp
-            const log = `#${count} Lv${lv} 戰鬥成功 獎勵: ${rewardC.strip(8)} 獲得經驗: ${successExp} HP損失: ${hploss}`
-            arr.unshift({ type: 'Fight', isSuccess, hploss, rewards: rewardC, exp: successExp, gas, lv, log, atk, def, agi, count })
-            const lv2 = getLv(exp)
+            totalExp += successExp
+            const log = `#${count} Lv${lv}(${totalExp}) 戰鬥成功 獎勵: ${rewardC.strip(8)} 獲得經驗: ${successExp} HP損失: ${hploss}`
+            arr.unshift({ type: 'Fight', isSuccess, hploss, rewards: rewardC, exp: successExp, gas, lv, log, atk, def, agi, count, totalExp })
+            const lv2 = getLv(totalExp)
             if (lv2 > lv) {
                 count++
                 const log = `#${count} 升級 ${lv2}`
@@ -300,13 +312,17 @@ export const calcFight = ({ card, cardData, buildData, gas, totalHp, enemyType }
                 def += 10
                 agi += 10
                 lv = lv2
-                arr.unshift({ type: 'level up', gas, lv, atk, def, agi, log, count })
+                arr.unshift({ type: 'level up', gas, lv, atk, def, agi, log, count, rewards: '', exp: '', hploss: '', totalExp })
             }
             return calc()
         } else {
+            successCount = 0
+            if (maxFair < ++fairCount) {
+                maxFair = fairCount
+            }
             hp -= enemyHploss
             const log = `#${count} 戰鬥失敗 Lv${lv} HP損失: ${enemyHploss}`
-            arr.unshift({type: 'Fight', isSuccess, hploss: enemyHploss, rewards: 0, exp: 0, gas, lv, atk, def, agi, log, count})
+            arr.unshift({type: 'Fight', isSuccess, hploss: enemyHploss, rewards: 0, exp: 0, gas, lv, atk, def, agi, log, count, totalExp})
             return calc()
         }
     }

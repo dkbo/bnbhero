@@ -102,6 +102,8 @@
             戰鬥成功: {{fightSuccess}}
             戰鬥失敗: {{fightFair}}
             實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
+            最大連勝次數: {{maxSuccess}}
+            最大連敗次數: {{maxFair}}
         </Col>
         <Col span="24" class="info2">
             獎金(BNB): {{totalRewards.toFixed(4)}}
@@ -109,7 +111,7 @@
         </Col>
     </Row>
     <div class="flex">
-        <div v-for="data in columns2" :key="data.key">{{ data.title }}</div>
+        <div v-for="data in columns" :key="data.key">{{ data.title }}</div>
     </div>
     <VirtualList
         style="height: calc(100vh - 486px); overflow-y: auto;"
@@ -140,6 +142,8 @@ export default {
             item,
             heroData,
             enemiesData,
+            maxSuccess: 0,
+            maxFair: 0,
             days: '',
             gas: '',
             name: '',
@@ -148,6 +152,14 @@ export default {
             card: ['', '', '', ''],
             build: ['', '', '', ''],
             columns: [
+                {
+                    title: '等級 Level',
+                    key: 'lv'
+                },
+                {
+                    title: '英雄經驗 Hero Exp',
+                    key: 'totalExp'
+                },
                 {
                     title: '獎勵 Rewards',
                     key: 'rewards'
@@ -175,11 +187,11 @@ export default {
             storage
         }
     },
-    mounted() {
+    beforeMount() {
         try {
             let {card, build, name, gas, enemyType, days} = JSON.parse(b64DecodeUnicode(this.$route.query.search))
             this.card = card
-            this.enemyType = enemyType
+            this.enemyType = +enemyType
             this.days = days
             this.build = build
             this.name = name
@@ -203,7 +215,7 @@ export default {
             return this.fightCount - this.fightSuccess
         },
         totalRewards() {
-            return this.tableData.reduce((value, {rewards = 0}) => value + rewards, 0)
+            return this.tableData.reduce((value, {rewards = 0}) => value + +rewards, 0)
         },
         successGas() {
             return this.tableData.reduce((value, {gas = 0}) => value + +gas, 0)
@@ -220,18 +232,28 @@ export default {
             const search = b64EncodeUnicode(JSON.stringify({build: this.build, card: this.card, name: this.name, gas: this.gas, enemyType: this.enemyType, days: this.days}))
             this.$router.push({ path: '', query: { search } })
             const { buildData, cardData } = calc2(this)
-            this.tableData = calcFight({ buildData, cardData, gas: this.gas, enemyType: this.enemyType, totalHp: this.days * cardData.everyDayHp, card: this.card })
+            const {
+                arr,
+                maxSuccess,
+                maxFair
+            } = calcFight({ buildData, cardData, gas: this.gas, enemyType: this.enemyType, totalHp: this.days * cardData.everyDayHp, card: this.card })
+            this.tableData = arr
+            this.maxSuccess = maxSuccess
+            this.maxFair = maxFair
             if (isStorage) {
                 const build = [...this.build]
                 const card = [...this.card]
                 const name = this.name
-                this.storage.unshift({ name, build, card, days: this.days, enemyType: this.enemyType })
+                this.storage.unshift({ name, build, card, days: this.days, enemyType: this.enemyType, gas: this.gas })
                 this.storage.length > 7 && this.storage.pop()
                 setStorage('HeroHighCalc', this.storage)
             }
         },
         handleRecodeCalc(i) {
-            const { build, card, name } = this.storage[i]
+            const { build, card, name, days, enemyType, gas } = this.storage[i]
+            this.gas = gas
+            this.days = days
+            this.enemyType = +enemyType
             this.name = name
             this.card = [...card]
             this.build = [...build]
@@ -270,5 +292,8 @@ export default {
   display: flex;
   justify-content: space-around;
   background: #f8f8f9;
+}
+.flex div {
+    width: 16.666%;
 }
 </style>

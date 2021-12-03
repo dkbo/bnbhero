@@ -273,13 +273,14 @@ export default {
                 const build = [...this.build]
                 const card = [...this.card]
                 const name = this.name
-                this.storage.unshift({ name, build, card })
+                this.storage.unshift({ name, build, card, gas: this.gas })
                 this.storage.length > 7 && this.storage.pop()
                 setStorage('HeroCalc', this.storage)
             }
         },
         handleRecodeCalc(i) {
-            const { build, card, name } = this.storage[i]
+            const { build, card, name, gas } = this.storage[i]
+            this.gas = gas
             this.name = name
             this.card = [...card]
             this.build = [...build]
