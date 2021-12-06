@@ -27,17 +27,28 @@
         </Row>
         <Row v-if="tableData.length">
             <Col span="24" class="info">
-                總戰鬥次數: {{fightCount}}
-                戰鬥成功: {{fightSuccess}}
-                戰鬥失敗: {{fightFair}}
-                實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
+                <Row>
+                    <Col span="6">戰鬥次數: {{fightCount}}</Col>
+                    <Col span="6">戰鬥成功: {{fightSuccess}}</Col>
+                    <Col span="6">戰鬥失敗: {{fightFair}}</Col>
+                    <Col span="6">實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%</Col>
+                </Row>
             </Col>
             <Col span="24" class="info2">
-                已領取(BNB): {{aleadyClaim.toFixed(4)}}
-                獎金(BNB): {{totalRewards.toFixed(4)}}
-                瓦斯費(BNB): {{successGas.toFixed(4)}}
-                失敗瓦斯費(BNB)(只篩選日期時間): {{fairGas.toFixed(4)}}
-
+                <Row>
+                    <Col span="6">
+                        獎金: {{totalRewards.toFixed(4)}} BNB
+                    </Col>
+                    <Col span="6">
+                        Gas: {{successGas.toFixed(4)}} BNB
+                    </Col>
+                    <Col span="6">
+                        失敗 Gas: {{fairGas.toFixed(4)}} BNB
+                    </Col>
+                    <Col span="6">
+                        已領取: {{aleadyClaim.toFixed(4)}} BNB
+                    </Col>
+                </Row>
             </Col>
         </Row>
         <div class="flex">
@@ -422,12 +433,14 @@ export default {
     padding: 5px;
     background: #67a95b;
     color: #e1e1e1;
+    text-align: center;
 }
 .info2 {
     font-size: 16px;
     padding: 5px;
     background: #495060;
     color: #c3c3c3;
+    text-align: center;
 }
 ::v-deep .ivu-input,
 ::v-deep .ivu-btn {
