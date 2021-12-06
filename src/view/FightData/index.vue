@@ -33,9 +33,11 @@
                 實際勝率: {{(fightSuccess / fightCount * 100).toFixed(2)}}%
             </Col>
             <Col span="24" class="info2">
+                已領取(BNB): {{aleadyClaim.toFixed(4)}}
                 獎金(BNB): {{totalRewards.toFixed(4)}}
                 瓦斯費(BNB): {{successGas.toFixed(4)}}
                 失敗瓦斯費(BNB)(只篩選日期時間): {{fairGas.toFixed(4)}}
+
             </Col>
         </Row>
         <div class="flex">
@@ -70,6 +72,7 @@ export default {
             walletAddress: getStorage('walletAddress') || '',
             dataAddress: '0xde9fFb228C1789FEf3F08014498F2b16c57db855',
             contract: '0x5CFFca0321b83dc873Bd2439aE7fEA10aE163fac',
+            bnbContract: '0xde8c58d082d39d04dc2e5241a3a65911454674cd',
             contractData: undefined,
             filterHero: '',
             filterEnemyType: '',
@@ -77,6 +80,7 @@ export default {
             eventType: 'Fight',
             startDate: null,
             endDate: null,
+            aleadyClaim: 0,
             data: [],
             columns: [
                 {
@@ -148,7 +152,51 @@ export default {
             this.isLoading = true
             // const count = await this.fetchGetCount()
             await this.fetchGetFightData()
+            this.aleadyClaim = await this.fetchGetBnbClaim()
             this.isLoading = false
+        },
+
+        fetchGetBnbClaim() {
+            return axios({
+                method: 'post',
+                url: this.api,
+                headers: {
+                    'X-API-KEY': 'BQYvhnv04csZHaprIBZNwtpRiDIwEIW9'
+                },
+                data: {
+                    query: `
+                    query ($network: EthereumNetwork!, $sender: String!, $receiver: String!) {
+  ethereum(network: $network) {
+    transfers(sender: {is: $sender}, receiver: {is: $receiver}) {
+      amount(amount: {}, calculate: sum)
+      currency {
+        symbol
+      }
+    }
+  }
+}`,
+                    variables: {
+                        network: this.network,
+                        sender: this.bnbContract,
+                        receiver: this.walletAddress
+                    }
+                }
+            })
+                .then(
+                    ({
+                        data: {
+                            data: {
+                                ethereum: { transfers }
+                            }
+                        }
+                    }) => transfers[0].amount
+                )
+                .catch((err) => {
+                    const message = '查詢領取BNB數據失敗'
+                    this.$Message.error(message)
+                    console.error(err, message)
+                    return 0
+                })
         },
         fetchGetCount() {
             return axios({
