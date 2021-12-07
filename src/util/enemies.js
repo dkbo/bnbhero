@@ -47,6 +47,13 @@ const enemies = [
         hploss: 400,
         exp: 400,
         reward: 0.02299
+    },
+    {
+        name: 'Boss 2',
+        success: 0.1,
+        hploss: 500,
+        exp: 2000,
+        reward: 3
     }
 ]
 export default enemies
